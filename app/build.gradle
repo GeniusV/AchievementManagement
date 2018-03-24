@@ -32,6 +32,8 @@ dependencies {
     compile 'com.android.support:design:26.+'
     compile 'com.android.support:support-v4:26.+'
 
+    //https://github.com/dvdciri/MultiChoiceRecyclerView
+    compile 'com.davidecirillo.multichoicerecyclerview:multichoicerecyclerview:2.3.0'
 }
 repositories {
     mavenCentral()
