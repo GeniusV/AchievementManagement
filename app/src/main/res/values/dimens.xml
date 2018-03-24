@@ -28,4 +28,9 @@
     <dimen name="card_margin">16dp</dimen>
     <dimen name="tab_margin">16dp</dimen>
     <dimen name="list_item_avatar_size">40dp</dimen>
+
+    <dimen name="list_horizontal_padding">16dp</dimen>
+    <dimen name="list_vertical_padding">8dp</dimen>
+
+
 </resources>

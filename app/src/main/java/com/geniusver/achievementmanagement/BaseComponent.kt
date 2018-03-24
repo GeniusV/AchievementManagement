@@ -31,8 +31,11 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
+import org.json.JSONObject
 
 /**
  * Created by GeniusV on 3/23/18.
@@ -40,10 +43,10 @@ import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 
 abstract class Data
 
-open class ContentFragment<T : RecyclerView.ViewHolder> : Fragment() {
+open class ContentFragment<T : RecyclerView.ViewHolder, K: Data> : Fragment() {
     lateinit var multiChoiceToolbar: MultiChoiceToolbar
     val queryTypeName = ""
-    lateinit var mAdapter: BaseRecyclerViewAdapter<T>
+    lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rc = inflater?.inflate(R.layout.fragment_list, container, false) as RecyclerView
@@ -80,12 +83,13 @@ open class ContentFragment<T : RecyclerView.ViewHolder> : Fragment() {
  * override onBindViewHolder
  * override defaultItemViewClickListener
  */
-abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder>(context: Context, items: List<Data>, val listItemId: Int) : MultiChoiceAdapter<T>() {
-    private val typedValue = TypedValue()
-    private val background: Int
-    private var values = ArrayList<Data>(items)
-    private val page = 20
-    private var offset = 0
+abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(val context: Context) : MultiChoiceAdapter<T>() {
+    protected val typedValue = TypedValue()
+    protected val background: Int
+    protected var values = ArrayList<Data>()
+    protected val size = 20
+    protected var page = 0
+    abstract val listItemRecourse: Int
 
 
     init {
@@ -98,33 +102,38 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder>(context: Con
         return values.size
     }
 
-    fun add(data: Data) {
-        values.add(data)
-        notifyDataSetChanged()
-    }
-
-    fun add(datas: List<Data>) {
-        values.addAll(datas)
-        notifyDataSetChanged()
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): T {
-        val view = LayoutInflater.from(parent?.context).inflate(listItemId, parent, false)
+        val view = LayoutInflater.from(parent?.context).inflate(listItemRecourse, parent, false)
         view.setBackgroundResource(background)
         return newViewHolder(view)
     }
 
     abstract fun newViewHolder(view: View): T
 
+
     fun loadMore() {
-        //todo http request
-        // add
-        notifyDataSetChanged()
+        queryData(page + 1, size)
+        page ++
     }
 
     fun refresh() {
-        //todo http request
+        queryData(0)
+        page = 0
+    }
+
+    protected fun add(datas: List<K>) {
+        values.addAll(datas)
         notifyDataSetChanged()
+    }
+
+    /**
+     * if request success will call add(datas: List<Data>), else print error
+     */
+    abstract fun queryData(page: Int = 0, size: Int = 20, successCallback: (List<K>) -> Unit = ::add, errorCallback: (VolleyError) -> Unit = ::errorHandle)
+
+    protected fun errorHandle(e: VolleyError) {
+        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 
 }

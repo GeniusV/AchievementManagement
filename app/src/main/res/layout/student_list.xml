@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2018 GeniusV
   ~
@@ -20,8 +21,26 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">AchievementManagement</string>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:paddingLeft="@dimen/list_horizontal_padding"
+              android:paddingRight="@dimen/list_horizontal_padding"
+              android:paddingTop="@dimen/list_vertical_padding"
+              android:paddingBottom="@dimen/list_vertical_padding"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+            android:gravity="center_vertical">
 
-    <string name="api_domain">http://localhost:8080</string>
-</resources>
+    <android.support.v4.widget.CircleImageView
+            android:id="@+id/avater"
+            android:layout_marginRight="16dp"
+            android:layout_width="@dimen/list_item_avatar_size"
+            android:layout_height="@dimen/list_item_avatar_size"/>
+
+    <TextView
+            android:id="@+id/stu_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceListItem"/>
+
+</LinearLayout>
