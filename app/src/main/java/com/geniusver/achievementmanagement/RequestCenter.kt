@@ -23,11 +23,13 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.icu.util.UniversalTimeScale.toLong
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -37,31 +39,31 @@ import org.json.JSONObject
 class RequestCenter {
 
     companion object {
-        val apiDomain = "http://localhost:8080"
+        val apiDomain = "http://192.168.1.109:8080"
 
         fun getStudents(page: Int, size: Int, context: Context, callback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
             val url  = "$apiDomain/student"
             val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                     null,
-                    Response.Listener<JSONObject> { processStudentData(it, callback) },
+                    Response.Listener<JSONObject> { processStudentsData(it, callback) },
                     Response.ErrorListener {errorCallback(it)})
             Volley.newRequestQueue(context).add(request)
         }
 
         private fun processStudentsData(studentsJSONObject: JSONObject, successCallback: (List<Student>) -> Unit){
-            //todo
+            val embedded = studentsJSONObject.getJSONObject("_embedded")
+            val student: JSONArray = embedded.getJSONArray("student")
+            val result = ArrayList<Student>()
+            for (i in 0 until student.length()) {
+                val name = student.getJSONObject(i).getString("name")
+                val links = student.getJSONObject(i).getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                result.add(Student(id, name))
+            }
+            successCallback(result)
         }
-
-        fun getStudent(id: Int, name: String = "", context: Context, callback: (List<Student>) -> Unit){
-            //todo
-        }
-
-
-
-        private fun processStudentData(studentsJSONObject: JSONObject, successCallback: (List<Student>) -> Unit) {
-            //todo
-        }
-
 
     }
 

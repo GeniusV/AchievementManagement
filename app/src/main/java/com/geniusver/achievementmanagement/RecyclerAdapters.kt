@@ -27,6 +27,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.android.volley.VolleyError
 import com.bumptech.glide.Glide
 
@@ -40,7 +41,6 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
     }
 
     override val listItemRecourse: Int
-
         get() = R.layout.student_list
 
     override fun newViewHolder(view: View): StudentViewHolder {
@@ -52,16 +52,18 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
         holder?.apply {
             student = mStudent
             textView.text = mStudent.name
-            Glide.with(holder.imageView.context)
-                    .load(R.drawable.ic_student)
-                    .fitCenter()
-                    .into(holder.imageView)
+//            Glide.with(holder.imageView.context)
+//                    .load(R.drawable.ic_student)
+//                    .fitCenter()
+//                    .into(holder.imageView)
         }
         super.onBindViewHolder(holder, position)
     }
 
     override fun defaultItemViewClickListener(holder: StudentViewHolder?, position: Int): View.OnClickListener {
-        return super.defaultItemViewClickListener(holder, position)
+        return View.OnClickListener {
+            Toast.makeText(context, "item clicked", Toast.LENGTH_SHORT).show()
+        }
     }
 
     class StudentViewHolder(view: View) : RecyclerView.ViewHolder(view) {

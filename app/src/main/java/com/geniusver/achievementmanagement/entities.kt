@@ -26,13 +26,13 @@ package com.geniusver.achievementmanagement
  * Created by GeniusV on 3/24/18.
  */
 
-data class Student(val id: Long, val name: String, val classId: Long, val className: String) : Data()
+data class Student(val id: Long, val name: String) : Data()
 
-data class Claxx(val id: Long, val name: String, val majorId: Long, val majorName: String) : Data()
+data class Claxx(val id: Long, val name: String) : Data()
 
-data class Course(val id: Long, val name: String, val collageId: Long, val collageName: String) : Data()
+data class Course(val id: Long, val name: String) : Data()
 
-data class Major(val id: Long, val name: String, val collageId: Long, val collageName: String) : Data()
+data class Major(val id: Long, val name: String) : Data()
 
 data class Score(val id: Long, val studentName: String, val courseName: String, val term: String) : Data()
 

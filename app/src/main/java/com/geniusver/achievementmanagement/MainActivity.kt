@@ -23,7 +23,10 @@
 package com.geniusver.achievementmanagement
 
 import android.os.Bundle
+import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
+import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,7 +34,26 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            setHomeAsUpIndicator(R.drawable.ic_menu)
+            setDisplayHomeAsUpEnabled(true)
+        }
 
+        viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
+            addFragment(ContentFragment<StudentRecyclerAdapter.StudentViewHolder, Student>().apply {
+                multiChoiceToolbar =  newMultiChoiceToolbar()
+                mAdapter = StudentRecyclerAdapter(applicationContext)
+            }, "Student")
+        }
 
+        tabs.setupWithViewPager(viewpaper)
+
+    }
+
+    fun newMultiChoiceToolbar(): MultiChoiceToolbar{
+        return MultiChoiceToolbar.Builder(this , toolbar)
+                .setTitles(toolbar.title.toString(),"item selected")
+                .setDefaultIcon(R.drawable.ic_menu, { drawer_layout.openDrawer(GravityCompat.START) }).build()
     }
 }

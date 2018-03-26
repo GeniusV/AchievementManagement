@@ -22,9 +22,11 @@
 
 package com.geniusver.achievementmanagement
 
-import android.app.Fragment
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
@@ -35,7 +37,6 @@ import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
-import org.json.JSONObject
 
 /**
  * Created by GeniusV on 3/23/18.
@@ -43,9 +44,8 @@ import org.json.JSONObject
 
 abstract class Data
 
-open class ContentFragment<T : RecyclerView.ViewHolder, K: Data> : Fragment() {
+open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var multiChoiceToolbar: MultiChoiceToolbar
-    val queryTypeName = ""
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -95,6 +95,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     init {
         context.theme.resolveAttribute(R.attr.selectableItemBackground, typedValue, true)
         background = typedValue.resourceId
+        refresh()
     }
 
 
@@ -114,7 +115,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
 
     fun loadMore() {
         queryData(page + 1, size)
-        page ++
+        page++
     }
 
     fun refresh() {
@@ -134,6 +135,29 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
 
     protected fun errorHandle(e: VolleyError) {
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+    }
+
+}
+
+class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private val fragments = ArrayList<Fragment>()
+    private val fragmentTitles = ArrayList<String>()
+
+    override fun getItem(position: Int): Fragment {
+        return fragments[position]
+    }
+
+    override fun getCount(): Int {
+        return fragments.size
+    }
+
+    fun addFragment(fragment: Fragment, title: String) {
+        fragments.add(fragment)
+        fragmentTitles.add(title)
+    }
+
+    override fun getPageTitle(position: Int): CharSequence {
+        return fragmentTitles[position]
     }
 
 }
