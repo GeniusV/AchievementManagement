@@ -40,20 +40,28 @@ class MainActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
         }
 
+        val refreshList = ArrayList<() -> Unit>()
+
         viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
-            addFragment(ContentFragment<StudentRecyclerAdapter.StudentViewHolder, Student>().apply {
-                multiChoiceToolbar =  newMultiChoiceToolbar()
-                mAdapter = StudentRecyclerAdapter(applicationContext)
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.StudentRecyclerAdapter.StudentViewHolder, com.geniusver.achievementmanagement.Student>().apply {
+                multiChoiceToolbar = newMultiChoiceToolbar()
+                mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext)
+                refreshList.add(this::refresh)
             }, "Student")
         }
 
+
         tabs.setupWithViewPager(viewpaper)
+
+        refresh.setOnClickListener {
+            refreshList.map { it() }
+        }
 
     }
 
-    fun newMultiChoiceToolbar(): MultiChoiceToolbar{
-        return MultiChoiceToolbar.Builder(this , toolbar)
-                .setTitles(toolbar.title.toString(),"item selected")
+    fun newMultiChoiceToolbar(): MultiChoiceToolbar {
+        return MultiChoiceToolbar.Builder(this, toolbar)
+                .setTitles(toolbar.title.toString(), "item selected")
                 .setDefaultIcon(R.drawable.ic_menu, { drawer_layout.openDrawer(GravityCompat.START) }).build()
     }
 }
