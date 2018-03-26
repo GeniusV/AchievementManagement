@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
 <!--
   ~ Copyright (c) 2018 GeniusV
   ~
@@ -20,8 +23,8 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">AchievementManagement</string>
-
-    <string name="api_domain">http://localhost:8080</string>
-</resources>
+<android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"/>

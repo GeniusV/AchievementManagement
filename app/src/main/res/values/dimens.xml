@@ -21,7 +21,16 @@
   -->
 
 <resources>
-    <string name="app_name">AchievementManagement</string>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="detail_backdrop_height">256dp</dimen>
+    <dimen name="card_margin">16dp</dimen>
+    <dimen name="tab_margin">16dp</dimen>
+    <dimen name="list_item_avatar_size">40dp</dimen>
 
-    <string name="api_domain">http://localhost:8080</string>
+    <dimen name="list_horizontal_padding">16dp</dimen>
+    <dimen name="list_vertical_padding">8dp</dimen>
+
+
 </resources>

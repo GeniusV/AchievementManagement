@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 26
@@ -29,6 +30,18 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    compile 'com.android.support:design:26.+'
+    compile 'com.android.support:support-v4:26.+'
+
+    //https://github.com/dvdciri/MultiChoiceRecyclerView
+    compile 'com.davidecirillo.multichoicerecyclerview:multichoicerecyclerview:2.3.0'
+
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+
+    compile group: 'com.android.volley', name: 'volley', version: '1.1.0'
+
+
+
 }
 repositories {
     mavenCentral()
