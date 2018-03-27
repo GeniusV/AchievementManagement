@@ -36,7 +36,7 @@ import com.android.volley.VolleyError
 
 class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<StudentRecyclerAdapter.StudentViewHolder, Student>(context) {
     override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.getStudents(page, size, context, ::add, ::errorHandle)
+        RequestCenter.StudentRequester.getStudents(page, size, context, ::add, ::errorHandle)
     }
 
     override fun newViewHolder(view: View): StudentViewHolder {
@@ -70,7 +70,7 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
 
 class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<CollageRecyclerAdapter.CollageViewHolder, Collage>(context) {
     override fun queryData(page: Int, size: Int, successCallback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.getCollages(page, size, context, ::add, ::errorHandle)
+        RequestCenter.CollageRequester.getCollages(page, size, context, ::add, ::errorHandle)
     }
 
 
