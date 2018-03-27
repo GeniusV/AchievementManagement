@@ -37,3 +37,5 @@ data class Major(val id: Long, val name: String) : Data()
 data class Score(val id: Long, val studentName: String, val courseName: String, val term: String) : Data()
 
 data class Term(val id: Long, val value: String) : Data()
+
+data class Collage(val id:Long, val value: String): Data()
