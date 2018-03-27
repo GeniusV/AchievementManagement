@@ -25,6 +25,8 @@ package com.geniusver.achievementmanagement
 import android.os.Bundle
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -66,5 +68,10 @@ class MainActivity : AppCompatActivity() {
         return MultiChoiceToolbar.Builder(this, toolbar)
                 .setTitles(toolbar.title.toString(), "item selected")
                 .setDefaultIcon(R.drawable.ic_menu, {}).build()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.options_menu, menu)
+        return true
     }
 }
