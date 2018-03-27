@@ -29,7 +29,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
-import com.bumptech.glide.Glide
 
 /**
  * Created by GeniusV on 3/24/18.
@@ -72,5 +71,40 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
         var imageView = view.findViewById<ImageView>(R.id.avater)
         var textView = view.findViewById<TextView>(R.id.stu_name)
     }
+}
 
+
+class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<CollageRecyclerAdapter.CollageViewHolder, Collage>(context) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.getCollages(page, size, context, ::add, ::errorHandle)
+    }
+
+    override val listItemRecourse: Int
+        get() = R.layout.student_list
+
+    override fun newViewHolder(view: View): CollageViewHolder {
+        return CollageViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: CollageViewHolder?, position: Int) {
+        var mCollage = values[position] as Collage
+        holder?.apply {
+            collage = mCollage
+            textView.text = mCollage.name
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: CollageViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            Toast.makeText(context, "item clicked", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    class CollageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var collage: Collage? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.stu_name)
+    }
 }

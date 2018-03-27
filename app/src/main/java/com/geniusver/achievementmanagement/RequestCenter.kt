@@ -65,6 +65,31 @@ class RequestCenter {
             successCallback(result)
         }
 
+
+        fun getCollages(page: Int, size: Int, context: Context, callback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+            val url  = "$apiDomain/collage"
+            val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                    null,
+                    Response.Listener<JSONObject> { processCollagesData(it, callback) },
+                    Response.ErrorListener {errorCallback(it)})
+            Volley.newRequestQueue(context).add(request)
+        }
+
+        private fun processCollagesData(collageJSONObject: JSONObject, successCallback: (List<Collage>) -> Unit){
+            val embedded = collageJSONObject.getJSONObject("_embedded")
+            val student: JSONArray = embedded.getJSONArray("collage")
+            val result = ArrayList<Collage>()
+            for (i in 0 until student.length()) {
+                val name = student.getJSONObject(i).getString("name")
+                val links = student.getJSONObject(i).getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                result.add(Collage(id, name))
+            }
+            successCallback(result)
+        }
+
     }
 
 }

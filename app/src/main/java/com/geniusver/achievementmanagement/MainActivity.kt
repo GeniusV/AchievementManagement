@@ -48,6 +48,11 @@ class MainActivity : AppCompatActivity() {
                 mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext)
                 refreshList.add(this::refresh)
             }, "Student")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.CollageRecyclerAdapter.CollageViewHolder, com.geniusver.achievementmanagement.Collage>().apply {
+                multiChoiceToolbar = newMultiChoiceToolbar()
+                mAdapter = com.geniusver.achievementmanagement.CollageRecyclerAdapter(applicationContext)
+                refreshList.add(this::refresh)
+            }, "Collage")
         }
 
 

@@ -38,4 +38,4 @@ data class Score(val id: Long, val studentName: String, val courseName: String, 
 
 data class Term(val id: Long, val value: String) : Data()
 
-data class Collage(val id:Long, val value: String): Data()
+data class Collage(val id:Long, val name: String): Data()
