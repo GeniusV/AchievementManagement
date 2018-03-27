@@ -45,7 +45,6 @@ import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 abstract class Data
 
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
-    lateinit var multiChoiceToolbar: MultiChoiceToolbar
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {

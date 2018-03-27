@@ -44,13 +44,11 @@ class MainActivity : AppCompatActivity() {
 
         viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
             addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.StudentRecyclerAdapter.StudentViewHolder, com.geniusver.achievementmanagement.Student>().apply {
-                multiChoiceToolbar = newMultiChoiceToolbar()
-                mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext)
+                mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Student")
             addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.CollageRecyclerAdapter.CollageViewHolder, com.geniusver.achievementmanagement.Collage>().apply {
-                multiChoiceToolbar = newMultiChoiceToolbar()
-                mAdapter = com.geniusver.achievementmanagement.CollageRecyclerAdapter(applicationContext)
+                mAdapter = com.geniusver.achievementmanagement.CollageRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Collage")
         }
@@ -67,6 +65,6 @@ class MainActivity : AppCompatActivity() {
     fun newMultiChoiceToolbar(): MultiChoiceToolbar {
         return MultiChoiceToolbar.Builder(this, toolbar)
                 .setTitles(toolbar.title.toString(), "item selected")
-                .setDefaultIcon(R.drawable.ic_menu, { drawer_layout.openDrawer(GravityCompat.START) }).build()
+                .setDefaultIcon(R.drawable.ic_menu, {}).build()
     }
 }
