@@ -35,11 +35,10 @@
             android:id="@+id/avater"
             android:layout_marginRight="16dp"
             android:layout_width="@dimen/list_item_avatar_size"
-            android:layout_height="@dimen/list_item_avatar_size"
-            android:src="@drawable/ic_student"/>
+            android:layout_height="@dimen/list_item_avatar_size"/>
 
     <TextView
-            android:id="@+id/stu_name"
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceListItem"/>

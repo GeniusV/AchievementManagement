@@ -39,9 +39,6 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
         RequestCenter.getStudents(page, size, context, ::add, ::errorHandle)
     }
 
-    override val listItemRecourse: Int
-        get() = R.layout.student_list
-
     override fun newViewHolder(view: View): StudentViewHolder {
         return StudentViewHolder(view)
     }
@@ -51,17 +48,14 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
         holder?.apply {
             student = mStudent
             textView.text = mStudent.name
-//            Glide.with(holder.imageView.context)
-//                    .load(R.drawable.ic_student)
-//                    .fitCenter()
-//                    .into(holder.imageView)
+            imageView.setImageResource(R.drawable.ic_student)
         }
         super.onBindViewHolder(holder, position)
     }
 
     override fun defaultItemViewClickListener(holder: StudentViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            Toast.makeText(context, "item clicked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "student clicked", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -69,7 +63,7 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
         val view = view
         var student: Student? = null
         var imageView = view.findViewById<ImageView>(R.id.avater)
-        var textView = view.findViewById<TextView>(R.id.stu_name)
+        var textView = view.findViewById<TextView>(R.id.name)
     }
 }
 
@@ -79,8 +73,6 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         RequestCenter.getCollages(page, size, context, ::add, ::errorHandle)
     }
 
-    override val listItemRecourse: Int
-        get() = R.layout.student_list
 
     override fun newViewHolder(view: View): CollageViewHolder {
         return CollageViewHolder(view)
@@ -91,13 +83,14 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         holder?.apply {
             collage = mCollage
             textView.text = mCollage.name
+            imageView.setImageResource(R.drawable.ic_collage)
         }
         super.onBindViewHolder(holder, position)
     }
 
     override fun defaultItemViewClickListener(holder: CollageViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            Toast.makeText(context, "item clicked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "collage clicked", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -105,6 +98,6 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         val view = view
         var collage: Collage? = null
         var imageView = view.findViewById<ImageView>(R.id.avater)
-        var textView = view.findViewById<TextView>(R.id.stu_name)
+        var textView = view.findViewById<TextView>(R.id.name)
     }
 }

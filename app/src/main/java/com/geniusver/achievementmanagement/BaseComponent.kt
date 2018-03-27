@@ -89,7 +89,6 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     protected var values = ArrayList<Data>()
     protected val size = 20
     protected var page = 0
-    abstract val listItemRecourse: Int
 
 
     init {
@@ -105,7 +104,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
 
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): T {
-        val view = LayoutInflater.from(parent?.context).inflate(listItemRecourse, parent, false)
+        val view = LayoutInflater.from(parent?.context).inflate(R.layout.base_list, parent, false)
         view.setBackgroundResource(background)
         return newViewHolder(view)
     }
@@ -119,6 +118,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     }
 
     fun refresh() {
+        values = ArrayList()
         queryData(0)
         page = 0
     }
