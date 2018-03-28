@@ -38,7 +38,7 @@ import org.json.JSONObject
 class RequestCenter {
 
     companion object {
-        val apiDomain = "http://192.168.43.224:8080"
+        val apiDomain = "http://192.168.1.109:8080"
     }
 
     class StudentRequester {
@@ -91,6 +91,34 @@ class RequestCenter {
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
                     result.add(Collage(id, name))
+                }
+                successCallback(result)
+            }
+        }
+    }
+
+    class MajorRequester {
+        companion object {
+            fun getMajors(page: Int, size: Int, context: Context, callback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val url = "$apiDomain/major"
+                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                        null,
+                        Response.Listener<JSONObject> { processMajorsData(it, callback) },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            private fun processMajorsData(majorJSONObject: JSONObject, successCallback: (List<Major>) -> Unit) {
+                val embedded = majorJSONObject.getJSONObject("_embedded")
+                val student: JSONArray = embedded.getJSONArray("major")
+                val result = ArrayList<Major>()
+                for (i in 0 until student.length()) {
+                    val name = student.getJSONObject(i).getString("name")
+                    val links = student.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Major(id, name))
                 }
                 successCallback(result)
             }

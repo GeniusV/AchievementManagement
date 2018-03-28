@@ -101,3 +101,37 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         var textView = view.findViewById<TextView>(R.id.name)
     }
 }
+
+class MajorRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<MajorRecyclerAdapter.MajorViewHolder, Major>(context) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.MajorRequester.getMajors(page, size, context, ::add, ::errorHandle)
+    }
+
+
+    override fun newViewHolder(view: View): MajorViewHolder {
+        return MajorViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: MajorViewHolder?, position: Int) {
+        var mMajor = values[position] as Major
+        holder?.apply {
+            major = mMajor
+            textView.text = mMajor.name
+            imageView.setImageResource(R.drawable.ic_major)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: MajorViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            Toast.makeText(context, "major clicked", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    class MajorViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var major: Major? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}

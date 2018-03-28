@@ -49,14 +49,19 @@ class MainActivity : AppCompatActivity() {
         val refreshList = ArrayList<() -> Unit>()
 
         viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
-            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.StudentRecyclerAdapter.StudentViewHolder, com.geniusver.achievementmanagement.Student>().apply {
-                mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
-                refreshList.add(this::refresh)
-            }, "Student")
+
             addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.CollageRecyclerAdapter.CollageViewHolder, com.geniusver.achievementmanagement.Collage>().apply {
                 mAdapter = com.geniusver.achievementmanagement.CollageRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Collage")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.MajorRecyclerAdapter.MajorViewHolder, com.geniusver.achievementmanagement.Major>().apply {
+                mAdapter = com.geniusver.achievementmanagement.MajorRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Major")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.StudentRecyclerAdapter.StudentViewHolder, com.geniusver.achievementmanagement.Student>().apply {
+                mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Student")
         }
 
 
