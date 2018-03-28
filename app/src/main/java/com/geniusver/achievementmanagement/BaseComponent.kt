@@ -77,8 +77,24 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater?.inflate(R.menu.options_menu, menu)
-        mAdapter.enableTrashButton = { menu?.findItem(R.id.menu_trash)?.setVisible(true) }
-        mAdapter.enableTrashButton = { menu?.findItem(R.id.menu_trash)?.setVisible(false) }
+        mAdapter.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener {
+            override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
+                menu?.findItem(R.id.menu_trash)?.setVisible(false)
+                menu?.findItem(R.id.menu_add)?.setVisible(true)
+            }
+
+            override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
+            }
+
+            override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                menu?.findItem(R.id.menu_trash)?.setVisible(true)
+                menu?.findItem(R.id.menu_add)?.setVisible(false)
+            }
+
+            override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+            }
+
+        })
     }
 
 
@@ -95,8 +111,6 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     protected var values = ArrayList<Data>()
     protected val size = 20
     protected var page = 0
-    lateinit var enableTrashButton: () -> Unit
-    lateinit var disableTrashButton: () -> Unit
 
 
     init {
@@ -144,8 +158,6 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     protected fun errorHandle(e: VolleyError) {
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
-
-
 
 }
 
