@@ -55,7 +55,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:id="@+id/detail_icon"
-                android:layout_gravity="end|center_vertical"/>
+                android:layout_gravity="end|center_vertical"
+                android:src="@drawable/ic_go"/>
     </LinearLayout>
 
 

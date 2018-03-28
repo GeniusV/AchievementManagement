@@ -22,28 +22,28 @@
 
 package com.geniusver.achievementmanagement
 
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_detail.*
+import android.content.Context
+import com.android.volley.VolleyError
 
-class DetailActivity : AppCompatActivity() {
+/**
+ * Created by GeniusV on 3/28/18.
+ */
+class CollageDetailAdapter(context: Context, val collage: Collage) : DetailAdapter<Collage>(context, collage) {
+    override val id: Long
+        get() = collage.id
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_detail)
+    override fun generateList() {
+        values = listOf(
+                DetailAdapter.DetailData("ID: " + entity.id, false),
+                DetailAdapter.DetailData("Name: " + entity.name, false)
+        )
+    }
 
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    override fun getItemCount(): Int {
+        return 2
+    }
 
-        val item = intent.getSerializableExtra("item") as Collage
-        val name = intent.getStringExtra("name")
-        val type = intent.getStringExtra("type")
-
-        collapsing_toolbar.title = name
-
-        detail.layoutManager = LinearLayoutManager(this)
-        detail.adapter = CollageDetailAdapter(this, item)
-
+    override fun queryDetail(successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.CollageRequester.getCollage(id, context, successCallback, errorCallback)
     }
 }

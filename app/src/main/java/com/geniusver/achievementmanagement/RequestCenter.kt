@@ -71,8 +71,8 @@ class RequestCenter {
 
     class CollageRequester {
         companion object {
+            val url = "$apiDomain/collage"
             fun getCollages(page: Int, size: Int, context: Context, callback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val url = "$apiDomain/collage"
                 val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                         null,
                         Response.Listener<JSONObject> { processCollagesData(it, callback) },
@@ -82,17 +82,35 @@ class RequestCenter {
 
             private fun processCollagesData(collageJSONObject: JSONObject, successCallback: (List<Collage>) -> Unit) {
                 val embedded = collageJSONObject.getJSONObject("_embedded")
-                val student: JSONArray = embedded.getJSONArray("collage")
+                val collage: JSONArray = embedded.getJSONArray("collage")
                 val result = ArrayList<Collage>()
-                for (i in 0 until student.length()) {
-                    val name = student.getJSONObject(i).getString("name")
-                    val links = student.getJSONObject(i).getJSONObject("_links")
+                for (i in 0 until collage.length()) {
+                    val name = collage.getJSONObject(i).getString("name")
+                    val links = collage.getJSONObject(i).getJSONObject("_links")
                     val self = links.getJSONObject("self")
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
                     result.add(Collage(id, name))
                 }
                 successCallback(result)
+            }
+
+            fun getCollage(id: Long,context: Context, successCallBack: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val request = JsonObjectRequest(Request.Method.GET, "$url/$id",null,
+                        Response.Listener<JSONObject> { processCollageData(it, successCallBack) },
+                        Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+
+            }
+
+            private fun processCollageData(collageJSONObject: JSONObject, successCallback: (Collage) -> Unit){
+                val name = collageJSONObject.getString("name")
+                val links = collageJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                successCallback(Collage(id, name))
             }
         }
     }

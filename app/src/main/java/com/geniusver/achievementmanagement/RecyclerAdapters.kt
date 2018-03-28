@@ -23,6 +23,7 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
@@ -90,7 +91,10 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
 
     override fun defaultItemViewClickListener(holder: CollageViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            Toast.makeText(context, "collage clicked", Toast.LENGTH_SHORT).show()
+            val  context = holder?.view?.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra("item", holder?.collage)
+            context?.startActivity(intent)
         }
     }
 

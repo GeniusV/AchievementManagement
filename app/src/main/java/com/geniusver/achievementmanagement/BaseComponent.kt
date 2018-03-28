@@ -23,6 +23,7 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.content.Entity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -31,16 +32,19 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
 import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
 import com.geniusver.achievementmanagement.R.id.refresh
+import java.io.Serializable
 
 /**
  * Created by GeniusV on 3/23/18.
  */
 
-abstract class Data
+abstract class Data: Serializable
 
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
@@ -184,37 +188,55 @@ class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 }
 
-abstract class DetailAdapter<T : RecyclerView.ViewHolder, K : Data>(val context: Context) : RecyclerView.Adapter<T>(){
+abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : RecyclerView.Adapter<DetailAdapter.DetailViewHolder>(){
     protected val typedValue = TypedValue()
     protected val background: Int
-    protected var values = ArrayList<Map<String, String>>()
+    abstract val id: Long
+    protected lateinit var values: List<DetailData>
 
     init {
         context.theme.resolveAttribute(R.attr.selectableItemBackground, typedValue, true)
         background = typedValue.resourceId
+        generateList()
     }
 
-    abstract fun newViewHolder(view: View): T
 
-
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): T {
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int):  DetailViewHolder{
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.detail_list, parent, false)
         view.setBackgroundResource(background)
-        return newViewHolder(view)
+        return DetailViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return values.size
+
+    fun replaceDetail(data: K){
+        entity = data
+        generateList()
     }
 
-    abstract fun replaceDetail(data: K)
-
-
+    abstract fun generateList()
 
     abstract fun queryDetail(successCallback: (K) -> Unit = ::replaceDetail, errorCallback: (VolleyError) -> Unit = ::errorHandle )
 
     protected fun errorHandle(e: VolleyError) {
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
+
+    override fun onBindViewHolder(holder: DetailViewHolder?, position: Int) {
+        holder?.apply {
+            textView.text = values[position].string
+            imageView.visibility = if(values[position].isGoEnable) View.VISIBLE else View.GONE
+        }
+    }
+
+    class DetailViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var textView = view.findViewById<TextView>(R.id.detail_text)
+        var imageView = view.findViewById<ImageView>(R.id.detail_icon)
+
+    }
+
+
+    data class DetailData(val string: String, val isGoEnable: Boolean)
+
 }
 
