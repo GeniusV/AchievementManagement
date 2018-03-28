@@ -25,16 +25,9 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-            android:id="@+id/menu_trash"
-            android:title="trash"
-            android:icon="@drawable/ic_trash"
+            android:id="@+id/search"
+            android:icon="@drawable/ic_search"
             app:showAsAction="collapseActionView|always"
-            android:visible="false"
-            />
-
-    <item
-            android:id="@+id/menu_add"
-            android:title="add"
-            android:icon="@drawable/ic_add"
-            app:showAsAction="collapseActionView|always"/>
+            app:actionViewClass="android.support.v7.widget.SearchView"
+            android:title=""/>
 </menu>

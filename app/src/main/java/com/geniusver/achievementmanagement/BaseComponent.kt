@@ -34,6 +34,7 @@ import android.view.*
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
+import com.geniusver.achievementmanagement.R.id.refresh
 
 /**
  * Created by GeniusV on 3/23/18.
@@ -181,6 +182,39 @@ class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     override fun getPageTitle(position: Int): CharSequence {
         return fragmentTitles[position]
     }
+}
 
+abstract class DetailAdapter<T : RecyclerView.ViewHolder, K : Data>(val context: Context) : RecyclerView.Adapter<T>(){
+    protected val typedValue = TypedValue()
+    protected val background: Int
+    protected var values = ArrayList<Map<String, String>>()
+
+    init {
+        context.theme.resolveAttribute(R.attr.selectableItemBackground, typedValue, true)
+        background = typedValue.resourceId
+    }
+
+    abstract fun newViewHolder(view: View): T
+
+
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): T {
+        val view = LayoutInflater.from(parent?.context).inflate(R.layout.detail_list, parent, false)
+        view.setBackgroundResource(background)
+        return newViewHolder(view)
+    }
+
+    override fun getItemCount(): Int {
+        return values.size
+    }
+
+    abstract fun replaceDetail(data: K)
+
+
+
+    abstract fun queryDetail(successCallback: (K) -> Unit = ::replaceDetail, errorCallback: (VolleyError) -> Unit = ::errorHandle )
+
+    protected fun errorHandle(e: VolleyError) {
+        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+    }
 }
 

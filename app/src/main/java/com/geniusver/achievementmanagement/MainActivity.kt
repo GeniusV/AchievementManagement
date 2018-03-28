@@ -22,9 +22,13 @@
 
 package com.geniusver.achievementmanagement
 
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
@@ -68,6 +72,28 @@ class MainActivity : AppCompatActivity() {
         return MultiChoiceToolbar.Builder(this, toolbar)
                 .setTitles(toolbar.title.toString(), "item selected")
                 .setDefaultIcon(R.drawable.ic_menu, {}).build()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.search_menu, menu)
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu?.findItem(R.id.search)?.actionView as SearchView
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+        tabs.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+            }
+
+        })
+
+        return true
     }
 
 }
