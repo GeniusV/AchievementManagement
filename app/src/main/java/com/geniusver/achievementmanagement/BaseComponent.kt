@@ -23,7 +23,6 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
-import android.content.Entity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -37,14 +36,14 @@ import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
-import com.geniusver.achievementmanagement.R.id.refresh
+import kotlinx.android.synthetic.main.activity_detail.*
 import java.io.Serializable
 
 /**
  * Created by GeniusV on 3/23/18.
  */
 
-abstract class Data: Serializable
+abstract class Data : Serializable
 
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
@@ -97,6 +96,10 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
             }
 
             override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                if (itemSelectedCount == 0) {
+                    menu?.findItem(R.id.menu_trash)?.setVisible(false)
+                    menu?.findItem(R.id.menu_add)?.setVisible(true)
+                }
             }
 
         })
@@ -188,7 +191,7 @@ class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 }
 
-abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : RecyclerView.Adapter<DetailAdapter.DetailViewHolder>(){
+abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : RecyclerView.Adapter<DetailAdapter.DetailViewHolder>() {
     protected val typedValue = TypedValue()
     protected val background: Int
     abstract val id: Long
@@ -201,21 +204,21 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     }
 
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int):  DetailViewHolder{
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): DetailViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.detail_list, parent, false)
         view.setBackgroundResource(background)
         return DetailViewHolder(view)
     }
 
 
-    fun replaceDetail(data: K){
+    fun replaceDetail(data: K) {
         entity = data
         generateList()
     }
 
     abstract fun generateList()
 
-    abstract fun queryDetail(successCallback: (K) -> Unit = ::replaceDetail, errorCallback: (VolleyError) -> Unit = ::errorHandle )
+    abstract fun queryDetail(successCallback: (K) -> Unit = ::replaceDetail, errorCallback: (VolleyError) -> Unit = ::errorHandle)
 
     protected fun errorHandle(e: VolleyError) {
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
@@ -224,7 +227,7 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     override fun onBindViewHolder(holder: DetailViewHolder?, position: Int) {
         holder?.apply {
             textView.text = values[position].string
-            imageView.visibility = if(values[position].isGoEnable) View.VISIBLE else View.GONE
+            imageView.visibility = if (values[position].isGoEnable) View.VISIBLE else View.GONE
         }
     }
 
