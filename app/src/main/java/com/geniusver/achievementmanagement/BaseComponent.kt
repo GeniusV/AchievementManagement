@@ -224,6 +224,10 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 
+    fun refresh() {
+        queryDetail()
+    }
+
     override fun onBindViewHolder(holder: DetailViewHolder?, position: Int) {
         holder?.apply {
             textView.text = values[position].string

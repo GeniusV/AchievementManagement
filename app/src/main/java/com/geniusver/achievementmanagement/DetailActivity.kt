@@ -41,7 +41,9 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        setupDetail()
+        val type = intent.getStringExtra("type")
+
+        setupDetail(type)
 
         refresh.setOnClickListener {
             refreshList.map { it() }
@@ -50,14 +52,15 @@ class DetailActivity : AppCompatActivity() {
     }
 
 
-    fun setupDetail() {
-        val type = intent.getStringExtra("type")
+    fun setupDetail(type: String) {
         when (type) {
             "collage" -> {
                 val item = intent.getSerializableExtra("item") as Collage
                 collapsing_toolbar.title = item.name
                 detail.layoutManager = LinearLayoutManager(this)
-                detail.adapter = CollageDetailAdapter(this, item)
+                detail.adapter = CollageDetailAdapter(this, item).apply {
+                    refreshList.add(this::refresh)
+                }
 
                 viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
                     addFragment(ContentFragment<MajorRecyclerAdapter.MajorViewHolder, Major>().apply {
