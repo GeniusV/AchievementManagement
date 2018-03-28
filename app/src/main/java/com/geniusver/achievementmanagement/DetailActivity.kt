@@ -36,14 +36,22 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val item = intent.getSerializableExtra("item") as Collage
-        val name = intent.getStringExtra("name")
+        setupDetail()
+    }
+
+    fun setupDetail() {
         val type = intent.getStringExtra("type")
-
-        collapsing_toolbar.title = name
-
-        detail.layoutManager = LinearLayoutManager(this)
-        detail.adapter = CollageDetailAdapter(this, item)
+        when(type){
+            "collage" -> {
+                val item = intent.getSerializableExtra("item") as Collage
+                collapsing_toolbar.title = item.name
+                detail.layoutManager = LinearLayoutManager(this)
+                detail.adapter = CollageDetailAdapter(this, item)
+            }
+        }
 
     }
+
+
+
 }
