@@ -34,7 +34,8 @@
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/detail_backdrop_height"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:elevation="0dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
                 android:layout_width="match_parent"
@@ -44,7 +45,8 @@
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleMarginStart="48dp"
-                app:expandedTitleMarginEnd="63dp">
+                app:expandedTitleMarginEnd="63dp"
+                >
 
             <android.support.v7.widget.RecyclerView
                     android:paddingTop="50dp"
@@ -59,7 +61,8 @@
                     android:layout_height="?attr/actionBarSize"
                     android:id="@+id/toolbar"
                     android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                    app:layout_collapseMode="pin"/>
+                    app:layout_collapseMode="pin"
+                    />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -77,7 +80,8 @@
                 android:id="@+id/tabs"
                 app:tabTextAppearance="@style/MyTabLayoutTextAppearance"
                 android:background="@color/colorPrimary"
-                app:tabMode="scrollable"/>
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="@color/tabSelected"/>
 
         <android.support.v4.view.ViewPager
                 android:layout_width="match_parent"

@@ -25,9 +25,14 @@ package com.geniusver.achievementmanagement
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 import kotlinx.android.synthetic.main.activity_detail.*
 
 class DetailActivity : AppCompatActivity() {
+
+
+    val refreshList = ArrayList<() -> Unit>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,21 +42,41 @@ class DetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         setupDetail()
-    }
 
-    fun setupDetail() {
-        val type = intent.getStringExtra("type")
-        when(type){
-            "collage" -> {
-                val item = intent.getSerializableExtra("item") as Collage
-                collapsing_toolbar.title = item.name
-                detail.layoutManager = LinearLayoutManager(this)
-                detail.adapter = CollageDetailAdapter(this, item)
-            }
+        refresh.setOnClickListener {
+            refreshList.map { it() }
         }
 
     }
 
 
+    fun setupDetail() {
+        val type = intent.getStringExtra("type")
+        when (type) {
+            "collage" -> {
+                val item = intent.getSerializableExtra("item") as Collage
+                collapsing_toolbar.title = item.name
+                detail.layoutManager = LinearLayoutManager(this)
+                detail.adapter = CollageDetailAdapter(this, item)
 
+                viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
+                    addFragment(ContentFragment<MajorRecyclerAdapter.MajorViewHolder, Major>().apply {
+                        mAdapter = MajorRecyclerAdapter(application).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                    }, "Major")
+                }
+            }
+
+        }
+        tabs.setupWithViewPager(viewpaper)
+    }
+
+
+    fun newMultiChoiceToolbar(): MultiChoiceToolbar {
+        return MultiChoiceToolbar.Builder(this, toolbar)
+                .setTitles("test", "item selected")
+                .setDefaultIcon(R.drawable.ic_back, { onBackPressed() }).build()
+    }
 }
