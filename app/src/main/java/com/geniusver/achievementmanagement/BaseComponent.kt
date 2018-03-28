@@ -30,13 +30,10 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
-import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 
 /**
  * Created by GeniusV on 3/23/18.
@@ -46,6 +43,10 @@ abstract class Data
 
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rc = inflater?.inflate(R.layout.fragment_list, container, false) as RecyclerView
@@ -74,6 +75,12 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
         rc.scrollToPosition(0)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.options_menu, menu)
+        mAdapter.enableTrashButton = { menu?.findItem(R.id.menu_trash)?.setVisible(true) }
+        mAdapter.enableTrashButton = { menu?.findItem(R.id.menu_trash)?.setVisible(false) }
+    }
+
 
 }
 
@@ -88,6 +95,8 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     protected var values = ArrayList<Data>()
     protected val size = 20
     protected var page = 0
+    lateinit var enableTrashButton: () -> Unit
+    lateinit var disableTrashButton: () -> Unit
 
 
     init {
@@ -135,6 +144,8 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     protected fun errorHandle(e: VolleyError) {
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
+
+
 
 }
 

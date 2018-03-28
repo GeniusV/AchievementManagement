@@ -70,8 +70,4 @@ class MainActivity : AppCompatActivity() {
                 .setDefaultIcon(R.drawable.ic_menu, {}).build()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.options_menu, menu)
-        return true
-    }
 }
