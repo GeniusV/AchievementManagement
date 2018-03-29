@@ -36,7 +36,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
-import kotlinx.android.synthetic.main.activity_detail.*
 import java.io.Serializable
 
 /**
@@ -44,6 +43,15 @@ import java.io.Serializable
  */
 
 abstract class Data : Serializable
+
+class IntentKey {
+
+    companion object {
+        const val TYPE = "type"
+        const val ITEM = "item"
+
+    }
+}
 
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>

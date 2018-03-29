@@ -23,7 +23,6 @@
 package com.geniusver.achievementmanagement
 
 import android.app.SearchManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -49,13 +48,12 @@ class DetailActivity : AppCompatActivity() {
 
         if (Intent.ACTION_SEARCH == intent.action) {
             var query = intent.getStringExtra(SearchManager.QUERY)
-            var type = intent.getStringExtra("type")
+            var type = intent.getStringExtra(IntentKey.TYPE)
             when (type) {
                 "collage" ->
                     RequestCenter.CollageRequester.getCollage(this,
-                            {collage -> intent.putExtra("item", collage);setupDetail() }, ::showError,
-                            id = query.toLongOrNull(), name = if(query.toLongOrNull() == null) query else query )
-
+                            {collage -> intent.putExtra(IntentKey.ITEM, collage);setupDetail() }, ::showError,
+                            id = query.toLongOrNull(), name = if(query.toLongOrNull() == null) query else "" )
             }
         } else {
             setupDetail()
@@ -63,10 +61,10 @@ class DetailActivity : AppCompatActivity() {
     }
 
     fun setupDetail() {
-        val type = intent.getStringExtra("type")
+        val type = intent.getStringExtra(IntentKey.TYPE)
         when (type) {
             "collage" -> {
-                val item = intent.getSerializableExtra("item") as Collage
+                val item = intent.getSerializableExtra(IntentKey.ITEM) as Collage
                 collapsing_toolbar.title = item.name
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = CollageDetailAdapter(this, item).apply {

@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun startActivity(intent: Intent?) {
         if (Intent.ACTION_SEARCH == intent?.action) {
-            intent.putExtra("type", currentTab.toLowerCase())
+            intent.putExtra(IntentKey.TYPE, currentTab.toLowerCase())
         }
         super.startActivity(intent)
     }
