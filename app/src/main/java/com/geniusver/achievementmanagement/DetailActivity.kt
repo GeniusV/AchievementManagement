@@ -22,9 +22,14 @@
 
 package com.geniusver.achievementmanagement
 
+import android.app.SearchManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.widget.Toast
+import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 import kotlinx.android.synthetic.main.activity_detail.*
 
@@ -41,18 +46,29 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val type = intent.getStringExtra("type")
 
-        setupDetail(type)
-
-        refresh.setOnClickListener {
-            refreshList.map { it() }
+        if (Intent.ACTION_SEARCH == intent.action) {
+            var query = intent.getStringExtra(SearchManager.QUERY)
+            var type = intent.getStringExtra("type")
+            when (type) {
+                "collage" ->{
+                    RequestCenter.CollageRequester.getCollage(query.toLong(), this, {collage -> intent.putExtra("item", collage);setupDetail() }, ::showError)
+                }
+            }
+        } else {
+            setupDetail()
         }
-
     }
 
+    fun setupDetail() {
+        val type = intent.getStringExtra("type")
 
-    fun setupDetail(type: String) {
+
+        if (Intent.ACTION_SEARCH == intent.action) {
+            var query = intent.getStringExtra(SearchManager.QUERY)
+        }
+
+
         when (type) {
             "collage" -> {
                 val item = intent.getSerializableExtra("item") as Collage
@@ -74,6 +90,9 @@ class DetailActivity : AppCompatActivity() {
 
         }
         tabs.setupWithViewPager(viewpaper)
+        refresh.setOnClickListener {
+            refreshList.map { it() }
+        }
     }
 
 
@@ -81,5 +100,9 @@ class DetailActivity : AppCompatActivity() {
         return MultiChoiceToolbar.Builder(this, toolbar)
                 .setTitles("test", "item selected")
                 .setDefaultIcon(R.drawable.ic_back, { onBackPressed() }).build()
+    }
+
+    fun showError(volleyError: VolleyError){
+        Toast.makeText(applicationContext, "query error", Toast.LENGTH_SHORT).show()
     }
 }

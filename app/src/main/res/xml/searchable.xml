@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2018 GeniusV
   ~
@@ -20,7 +21,7 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">AchievementManagement</string>
-    <string name="search_hint">Search</string>
-</resources>
+<searchable xmlns:android="http://schemas.android.com/apk/res/android"
+            android:label="@string/app_name"
+            android:hint="@string/search_hint" >
+</searchable>

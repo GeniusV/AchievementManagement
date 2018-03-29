@@ -24,6 +24,7 @@ package com.geniusver.achievementmanagement
 
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.view.GravityCompat
@@ -35,6 +36,8 @@ import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    var currentTab = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,12 +96,21 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
+                currentTab = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
                 searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
             }
 
         })
+        currentTab = tabs.getTabAt(0)?.text.toString()
 
         return true
+    }
+
+    override fun startActivity(intent: Intent?) {
+        if (Intent.ACTION_SEARCH == intent?.action) {
+            intent.putExtra("type", currentTab.toLowerCase())
+        }
+        super.startActivity(intent)
     }
 
 }
