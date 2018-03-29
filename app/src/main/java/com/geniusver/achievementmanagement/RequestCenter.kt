@@ -28,6 +28,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.geniusver.achievementmanagement.R.id.name
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -95,8 +96,11 @@ class RequestCenter {
                 successCallback(result)
             }
 
-            fun getCollage(id: Long,context: Context, successCallBack: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url/$id",null,
+            fun getCollage(context: Context, successCallBack: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
+
+                val requestUrl = if(name == "") "$url/$id" else "$url/search/findByName?name=$name"
+
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl,null,
                         Response.Listener<JSONObject> { processCollageData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )

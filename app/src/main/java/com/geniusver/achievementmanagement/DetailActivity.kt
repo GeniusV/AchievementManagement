@@ -51,9 +51,11 @@ class DetailActivity : AppCompatActivity() {
             var query = intent.getStringExtra(SearchManager.QUERY)
             var type = intent.getStringExtra("type")
             when (type) {
-                "collage" ->{
-                    RequestCenter.CollageRequester.getCollage(query.toLong(), this, {collage -> intent.putExtra("item", collage);setupDetail() }, ::showError)
-                }
+                "collage" ->
+                    RequestCenter.CollageRequester.getCollage(this,
+                            {collage -> intent.putExtra("item", collage);setupDetail() }, ::showError,
+                            id = query.toLongOrNull(), name = if(query.toLongOrNull() == null) query else query )
+
             }
         } else {
             setupDetail()
@@ -62,13 +64,6 @@ class DetailActivity : AppCompatActivity() {
 
     fun setupDetail() {
         val type = intent.getStringExtra("type")
-
-
-        if (Intent.ACTION_SEARCH == intent.action) {
-            var query = intent.getStringExtra(SearchManager.QUERY)
-        }
-
-
         when (type) {
             "collage" -> {
                 val item = intent.getSerializableExtra("item") as Collage

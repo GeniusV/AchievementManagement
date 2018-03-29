@@ -44,6 +44,6 @@ class CollageDetailAdapter(context: Context, val collage: Collage) : DetailAdapt
     }
 
     override fun queryDetail(successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.CollageRequester.getCollage(id, context, successCallback, errorCallback)
+        RequestCenter.CollageRequester.getCollage(context, successCallback, errorCallback,id)
     }
 }
