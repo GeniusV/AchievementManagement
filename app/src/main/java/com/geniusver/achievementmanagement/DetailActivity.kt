@@ -47,8 +47,8 @@ class DetailActivity : AppCompatActivity() {
 
 
         if (Intent.ACTION_SEARCH == intent.action) {
-            var query = intent.getStringExtra(SearchManager.QUERY)
-            var type = intent.getStringExtra(IntentKey.TYPE)
+            val query = intent.getStringExtra(SearchManager.QUERY)
+            val type = intent.getStringExtra(IntentKey.TYPE)
             when (type) {
                 "collage" ->
                     RequestCenter.CollageRequester.getCollage(this,

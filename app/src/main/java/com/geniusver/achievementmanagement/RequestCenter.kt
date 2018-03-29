@@ -23,12 +23,15 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.util.Log
+import com.android.volley.NetworkResponse
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
+import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.JsonRequest
 import com.android.volley.toolbox.Volley
-import com.geniusver.achievementmanagement.R.id.name
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -98,9 +101,9 @@ class RequestCenter {
 
             fun getCollage(context: Context, successCallBack: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
 
-                val requestUrl = if(name == "") "$url/$id" else "$url/search/findByName?name=$name"
+                val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
 
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl,null,
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processCollageData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
@@ -108,13 +111,20 @@ class RequestCenter {
 
             }
 
-            private fun processCollageData(collageJSONObject: JSONObject, successCallback: (Collage) -> Unit){
+            private fun processCollageData(collageJSONObject: JSONObject, successCallback: (Collage) -> Unit) {
                 val name = collageJSONObject.getString("name")
                 val links = collageJSONObject.getJSONObject("_links")
                 val self = links.getJSONObject("self")
                 val href = self.getString("href")
                 val id = href.split("/").last().toLong()
                 successCallback(Collage(id, name))
+            }
+
+            fun postCollage(collage: Collage, context: Context, successCallBack: (Boolean) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val name = mapOf<String, String>(Pair<String, String>("name", collage.name))
+                val jsonObject = JSONObject(name)
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject, Response.Listener { successCallBack(true) }, Response.ErrorListener { Log.e("request", "error", it);errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
             }
         }
     }

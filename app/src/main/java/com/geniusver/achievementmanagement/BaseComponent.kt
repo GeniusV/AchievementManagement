@@ -23,10 +23,12 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
@@ -77,14 +79,13 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
                 }
             }
         })
-
         return rc
     }
 
     fun refresh() {
         mAdapter.refresh()
-        val rc = view as RecyclerView
-        rc.scrollToPosition(0)
+//        val rc = view as RecyclerView
+//        rc.scrollToPosition(0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -254,4 +255,17 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     data class DetailData(val string: String, val isGoEnable: Boolean)
 
 }
+
+interface Identifiable {
+    val identifier: Int
+}
+
+fun <T> appendOnClick(activity: T, type: String) where T : AppCompatActivity, T : Identifiable {
+    var intent = Intent()
+    when (type) {
+        "collage" -> intent = Intent(activity, CollageEditActivity::class.java)
+    }
+    activity.startActivityForResult(intent, activity.identifier)
+}
+
 

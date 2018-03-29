@@ -22,20 +22,23 @@
 
 package com.geniusver.achievementmanagement
 
+import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Identifiable {
+    override val identifier: Int
+        get() = 1
 
     var currentTab = ""
 
@@ -111,6 +114,28 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(IntentKey.TYPE, currentTab.toLowerCase())
         }
         super.startActivity(intent)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            R.id.menu_add ->{
+                appendOnClick(this, currentTab.toLowerCase())
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode) {
+            identifier -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    refresh.callOnClick()
+                } else {
+                    Toast.makeText(this, "response failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
 }
