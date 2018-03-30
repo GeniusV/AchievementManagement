@@ -38,11 +38,11 @@ class CollageEditActivity : AppCompatActivity() {
         setContentView(R.layout.activity_collage_edit)
 
         setSupportActionBar(toolbar)
-        toolbar.title = "Add Collage"
 
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
+            title = "Collage"
         }
     }
 
