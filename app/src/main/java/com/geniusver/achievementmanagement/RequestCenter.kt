@@ -123,7 +123,7 @@ class RequestCenter {
             fun postCollage(collage: Collage, context: Context, successCallBack: (Boolean) -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val name = mapOf<String, String>(Pair<String, String>("name", collage.name))
                 val jsonObject = JSONObject(name)
-                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject, Response.Listener { successCallBack(true) }, Response.ErrorListener { Log.e("request", "error", it);errorCallback(it) })
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject, Response.Listener { successCallBack(true) }, Response.ErrorListener { Log.e("request", it.networkResponse.toString(), it);errorCallback(it) })
                 Volley.newRequestQueue(context).add(request)
             }
         }

@@ -23,6 +23,7 @@
 package com.geniusver.achievementmanagement
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -57,7 +58,10 @@ class CollageEditActivity : AppCompatActivity() {
             }
             R.id.menu_ok -> {
                 RequestCenter.CollageRequester.postCollage(Collage(0, collage_name.text.toString()), applicationContext,
-                        { setResult(Activity.RESULT_OK); finish() }, { setResult(Activity.RESULT_CANCELED);finish() })
+                        { setResult(Activity.RESULT_OK); finish() }, {AlertDialog.Builder(this).apply {
+                    setMessage("Name already exists!!")
+                    setPositiveButton("Ok", { _, _ ->  Unit })
+                }.create().show()})
             }
         }
         return super.onOptionsItemSelected(item)
