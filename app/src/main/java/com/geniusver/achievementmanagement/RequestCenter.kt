@@ -24,13 +24,10 @@ package com.geniusver.achievementmanagement
 
 import android.content.Context
 import android.util.Log
-import com.android.volley.NetworkResponse
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
-import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.JsonRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
@@ -125,6 +122,18 @@ class RequestCenter {
                 val jsonObject = JSONObject(name)
                 val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject, Response.Listener { successCallBack(true) }, Response.ErrorListener { Log.e("request", it.networkResponse.toString(), it);errorCallback(it) })
                 Volley.newRequestQueue(context).add(request)
+            }
+
+            fun deleteCollages(collages: List<Collage>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val requestQueue = Volley.newRequestQueue(context)
+                collages.map {
+                    val id = it.id
+                    val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
+                            null,
+                            Response.Listener<JSONObject> { successCallback() },
+                            Response.ErrorListener { errorCallback(it) })
+                    requestQueue.add(request)
+                }
             }
         }
     }

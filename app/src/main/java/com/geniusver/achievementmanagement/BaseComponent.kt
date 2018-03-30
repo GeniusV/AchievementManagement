@@ -38,6 +38,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
+import kotlinx.android.synthetic.main.fragment_list.*
 import java.io.Serializable
 
 /**
@@ -114,6 +115,13 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
         })
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId) {
+            R.id.menu_trash -> mAdapter.deleteSelectedData()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
 }
 
@@ -125,7 +133,7 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
 abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(val context: Context) : MultiChoiceAdapter<T>() {
     protected val typedValue = TypedValue()
     protected val background: Int
-    protected var values = ArrayList<Data>()
+    protected var values = ArrayList<K>()
     protected val size = 20
     protected var page = 0
 
@@ -176,6 +184,20 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 
+    protected fun deleteSuccessHandle(){
+        Toast.makeText(context, "Delete Success!!", Toast.LENGTH_SHORT).show()
+        refresh()
+    }
+
+    fun deleteSelectedData(){
+        val selectedData = selectedItemList.map {
+            values[it]
+        }
+        deselectAll()
+        performDelete(selectedData)
+    }
+
+    abstract fun performDelete(data: List<K>)
 }
 
 class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {

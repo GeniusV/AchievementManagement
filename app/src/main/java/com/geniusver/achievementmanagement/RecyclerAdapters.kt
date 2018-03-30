@@ -36,6 +36,10 @@ import com.android.volley.VolleyError
  */
 
 class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<StudentRecyclerAdapter.StudentViewHolder, Student>(context) {
+    override fun performDelete(data: List<Student>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.StudentRequester.getStudents(page, size, context, ::add, ::errorHandle)
     }
@@ -70,6 +74,10 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
 
 
 class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<CollageRecyclerAdapter.CollageViewHolder, Collage>(context) {
+    override fun performDelete(data: List<Collage>) {
+        RequestCenter.CollageRequester.deleteCollages(data, context, ::deleteSuccessHandle, ::errorHandle)
+    }
+
     override fun queryData(page: Int, size: Int, successCallback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.CollageRequester.getCollages(page, size, context, ::add, ::errorHandle)
     }
@@ -99,6 +107,14 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         }
     }
 
+//    override fun deleteSelectedData() {
+//        val collages = selectedItemList.map {
+//            values[it]
+//        }
+//    }
+
+
+
     class CollageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val view = view
         var collage: Collage? = null
@@ -108,6 +124,10 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
 }
 
 class MajorRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<MajorRecyclerAdapter.MajorViewHolder, Major>(context) {
+    override fun performDelete(data: List<Major>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun queryData(page: Int, size: Int, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.MajorRequester.getMajors(page, size, context, ::add, ::errorHandle)
     }
