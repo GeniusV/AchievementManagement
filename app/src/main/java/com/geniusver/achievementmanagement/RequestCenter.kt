@@ -117,10 +117,12 @@ class RequestCenter {
                 successCallback(Collage(id, name))
             }
 
-            fun postCollage(collage: Collage, context: Context, successCallBack: (Boolean) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val name = mapOf<String, String>(Pair<String, String>("name", collage.name))
+            fun postCollage(collage: Collage, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val name = mapOf(Pair("name", collage.name))
                 val jsonObject = JSONObject(name)
-                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject, Response.Listener { successCallBack(true) }, Response.ErrorListener { Log.e("request", it.networkResponse.toString(), it);errorCallback(it) })
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
+                        Response.Listener { successCallBack() },
+                        Response.ErrorListener { errorCallback(it) })
                 Volley.newRequestQueue(context).add(request)
             }
 
@@ -137,7 +139,7 @@ class RequestCenter {
             }
 
             fun patchCollage(collage: Collage, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf<String, String>(Pair("name", collage.name))
+                val data = mapOf(Pair("name", collage.name))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${collage.id}", jsonObject,
                         Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
