@@ -95,6 +95,8 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
             override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
                 menu?.findItem(R.id.menu_trash)?.setVisible(false)
                 menu?.findItem(R.id.menu_add)?.setVisible(true)
+                menu?.findItem(R.id.search)?.setVisible(true)
+
             }
 
             override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
@@ -103,12 +105,15 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
             override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
                 menu?.findItem(R.id.menu_trash)?.setVisible(true)
                 menu?.findItem(R.id.menu_add)?.setVisible(false)
+                menu?.findItem(R.id.search)?.setVisible(false)
+
             }
 
             override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
                 if (itemSelectedCount == 0) {
                     menu?.findItem(R.id.menu_trash)?.setVisible(false)
                     menu?.findItem(R.id.menu_add)?.setVisible(true)
+                    menu?.findItem(R.id.search)?.setVisible(true)
                 }
             }
 
