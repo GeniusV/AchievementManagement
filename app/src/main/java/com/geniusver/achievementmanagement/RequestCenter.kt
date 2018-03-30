@@ -135,6 +135,14 @@ class RequestCenter {
                     requestQueue.add(request)
                 }
             }
+
+            fun patchCollage(collage: Collage, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf<String, String>(Pair("name", collage.name))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${collage.id}", jsonObject,
+                        Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
         }
     }
 

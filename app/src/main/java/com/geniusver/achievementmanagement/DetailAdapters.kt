@@ -37,6 +37,7 @@ class CollageDetailAdapter(context: Context, val collage: Collage) : DetailAdapt
                 DetailAdapter.DetailData("ID: " + entity.id, false),
                 DetailAdapter.DetailData("Name: " + entity.name, false)
         )
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

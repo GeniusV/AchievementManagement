@@ -51,6 +51,7 @@ class CollageEditActivity : AppCompatActivity() {
         if (action == IntentValue.Action.UPDATE) {
             val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
             supportActionBar?.title = "Collage: ${collage.id}"
+            collage_name.setText(collage.name)
         }
 
     }
@@ -75,7 +76,14 @@ class CollageEditActivity : AppCompatActivity() {
                         }.create().show()
                     })
                 } else {
-
+                    val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
+                    RequestCenter.CollageRequester.patchCollage(Collage(collage.id, collage_name.text.toString()), applicationContext,
+                            { setResult(Activity.RESULT_OK); finish() }, {
+                        AlertDialog.Builder(this).apply {
+                            setMessage("Name already exists!!")
+                            setPositiveButton("Ok", { _, _ -> Unit })
+                        }.create().show()
+                    })
                 }
             }
         }
