@@ -22,17 +22,21 @@
 
 package com.geniusver.achievementmanagement
 
+import android.app.Activity
 import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.MenuItem
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 import kotlinx.android.synthetic.main.activity_detail.*
 
-class DetailActivity : AppCompatActivity() {
+class DetailActivity : AppCompatActivity(), Identifiable {
+    override val identifier: Int
+        get() = 2
 
 
     val refreshList = ArrayList<() -> Unit>()
@@ -52,8 +56,8 @@ class DetailActivity : AppCompatActivity() {
             when (type) {
                 "collage" ->
                     RequestCenter.CollageRequester.getCollage(this,
-                            {collage -> intent.putExtra(IntentKey.ITEM, collage);setupDetail() }, ::showError,
-                            id = query.toLongOrNull(), name = if(query.toLongOrNull() == null) query else "" )
+                            { collage -> intent.putExtra(IntentKey.ITEM, collage);setupDetail() }, ::showError,
+                            id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
             }
         } else {
             setupDetail()
@@ -77,6 +81,7 @@ class DetailActivity : AppCompatActivity() {
                             setMultiChoiceToolbar(newMultiChoiceToolbar())
                         }
                         refreshList.add(this::refresh)
+                        enableEdit = true
                     }, "Major")
                 }
             }
@@ -88,6 +93,26 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.menu_edit -> {
+                val type = intent.getStringExtra(IntentKey.TYPE)
+                when (type) {
+                    "collage" ->{
+                        val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
+                        val intent = Intent(this, CollageEditActivity::class.java).apply {
+                            putExtra(IntentKey.TYPE, "collage")
+                            putExtra(IntentKey.ITEM, collage)
+                            putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                        }
+                        startActivityForResult(intent, identifier)
+                    }
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     fun newMultiChoiceToolbar(): MultiChoiceToolbar {
         return MultiChoiceToolbar.Builder(this, toolbar)
@@ -95,7 +120,19 @@ class DetailActivity : AppCompatActivity() {
                 .setDefaultIcon(R.drawable.ic_back, { onBackPressed() }).build()
     }
 
-    fun showError(volleyError: VolleyError){
+    fun showError(volleyError: VolleyError) {
         Toast.makeText(applicationContext, "query error", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode) {
+            identifier -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    refresh.callOnClick()
+                } else {
+                    Toast.makeText(this, "response failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }

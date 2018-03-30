@@ -101,8 +101,8 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         return View.OnClickListener {
             val  context = holder?.view?.context
             val intent = Intent(context, DetailActivity::class.java)
-            intent.putExtra("item", holder?.collage)
-            intent.putExtra("type", "collage")
+            intent.putExtra(IntentKey.ITEM, holder?.collage)
+            intent.putExtra(IntentKey.TYPE, "collage")
             context?.startActivity(intent)
         }
     }

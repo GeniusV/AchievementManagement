@@ -52,12 +52,24 @@ class IntentKey {
     companion object {
         const val TYPE = "type"
         const val ITEM = "item"
-
+        const val ACTION = "action"
     }
+}
+
+class IntentValue{
+
+    class Action{
+        companion object {
+            const val UPDATE = "update"
+            const val INSERT = "insert"
+        }
+    }
+
 }
 
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
+    var enableEdit = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -91,29 +103,29 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater?.inflate(R.menu.options_menu, menu)
+        if(enableEdit) menu?.findItem(R.id.menu_edit)?.isVisible = true
         mAdapter.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener {
             override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
-                menu?.findItem(R.id.menu_trash)?.setVisible(false)
-                menu?.findItem(R.id.menu_add)?.setVisible(true)
-                menu?.findItem(R.id.search)?.setVisible(true)
-
+                menu?.findItem(R.id.menu_trash)?.isVisible = false
+                menu?.findItem(R.id.menu_add)?.isVisible = true
+                menu?.findItem(R.id.search)?.isVisible = true
             }
 
             override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
             }
 
             override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
-                menu?.findItem(R.id.menu_trash)?.setVisible(true)
-                menu?.findItem(R.id.menu_add)?.setVisible(false)
-                menu?.findItem(R.id.search)?.setVisible(false)
+                menu?.findItem(R.id.menu_trash)?.isVisible = true
+                menu?.findItem(R.id.menu_add)?.isVisible = false
+                menu?.findItem(R.id.search)?.isVisible = false
 
             }
 
             override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
                 if (itemSelectedCount == 0) {
-                    menu?.findItem(R.id.menu_trash)?.setVisible(false)
-                    menu?.findItem(R.id.menu_add)?.setVisible(true)
-                    menu?.findItem(R.id.search)?.setVisible(true)
+                    menu?.findItem(R.id.menu_trash)?.isVisible = false
+                    menu?.findItem(R.id.menu_add)?.isVisible = true
+                    menu?.findItem(R.id.search)?.isVisible = true
                 }
             }
 
@@ -290,7 +302,7 @@ interface Identifiable {
 fun <T> appendOnClick(activity: T, type: String) where T : AppCompatActivity, T : Identifiable {
     var intent = Intent()
     when (type) {
-        "collage" -> intent = Intent(activity, CollageEditActivity::class.java)
+        "collage" -> intent = Intent(activity, CollageEditActivity::class.java).apply { putExtra(IntentKey.ACTION, IntentValue.Action.INSERT) }
     }
     activity.startActivityForResult(intent, activity.identifier)
 }

@@ -32,6 +32,7 @@ import kotlinx.android.synthetic.main.activity_collage_edit.*
 import kotlinx.android.synthetic.main.edit_header.*
 
 class CollageEditActivity : AppCompatActivity() {
+    lateinit var action: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +45,14 @@ class CollageEditActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
             title = "Collage"
         }
+
+        action = intent.getStringExtra(IntentKey.ACTION)
+
+        if (action == IntentValue.Action.UPDATE) {
+            val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
+            supportActionBar?.title = "Collage: ${collage.id}"
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -57,11 +66,17 @@ class CollageEditActivity : AppCompatActivity() {
                 onBackPressed(); return true
             }
             R.id.menu_ok -> {
-                RequestCenter.CollageRequester.postCollage(Collage(0, collage_name.text.toString()), applicationContext,
-                        { setResult(Activity.RESULT_OK); finish() }, {AlertDialog.Builder(this).apply {
-                    setMessage("Name already exists!!")
-                    setPositiveButton("Ok", { _, _ ->  Unit })
-                }.create().show()})
+                if (action == IntentValue.Action.INSERT) {
+                    RequestCenter.CollageRequester.postCollage(Collage(0, collage_name.text.toString()), applicationContext,
+                            { setResult(Activity.RESULT_OK); finish() }, {
+                        AlertDialog.Builder(this).apply {
+                            setMessage("Name already exists!!")
+                            setPositiveButton("Ok", { _, _ -> Unit })
+                        }.create().show()
+                    })
+                } else {
+
+                }
             }
         }
         return super.onOptionsItemSelected(item)
