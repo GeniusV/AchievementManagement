@@ -23,7 +23,7 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
-import android.icu.util.UniversalTimeScale.toLong
+import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
@@ -39,32 +39,141 @@ import org.json.JSONObject
 class RequestCenter {
 
     companion object {
-        val apiDomain = "http://192.168.1.109:8080"
+        val apiDomain = "http://192.168.0.101:8080"
+    }
 
-        fun getStudents(page: Int, size: Int, context: Context, callback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-            val url  = "$apiDomain/student"
-            val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
-                    null,
-                    Response.Listener<JSONObject> { processStudentsData(it, callback) },
-                    Response.ErrorListener {errorCallback(it)})
-            Volley.newRequestQueue(context).add(request)
+    class StudentRequester {
+        companion object {
+            fun getStudents(page: Int, size: Int, context: Context, callback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val url = "$apiDomain/student"
+                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                        null,
+                        Response.Listener<JSONObject> { processStudentsData(it, callback) },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            private fun processStudentsData(studentsJSONObject: JSONObject, successCallback: (List<Student>) -> Unit) {
+                val embedded = studentsJSONObject.getJSONObject("_embedded")
+                val student: JSONArray = embedded.getJSONArray("student")
+                val result = ArrayList<Student>()
+                for (i in 0 until student.length()) {
+                    val name = student.getJSONObject(i).getString("name")
+                    val links = student.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Student(id, name))
+                }
+                successCallback(result)
+            }
         }
+    }
 
-        private fun processStudentsData(studentsJSONObject: JSONObject, successCallback: (List<Student>) -> Unit){
-            val embedded = studentsJSONObject.getJSONObject("_embedded")
-            val student: JSONArray = embedded.getJSONArray("student")
-            val result = ArrayList<Student>()
-            for (i in 0 until student.length()) {
-                val name = student.getJSONObject(i).getString("name")
-                val links = student.getJSONObject(i).getJSONObject("_links")
+    class CollageRequester {
+        companion object {
+            val url = "$apiDomain/collage"
+            fun getCollages(page: Int, size: Int, context: Context, callback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                        null,
+                        Response.Listener<JSONObject> { processCollagesData(it, callback) },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            private fun processCollagesData(collageJSONObject: JSONObject, successCallback: (List<Collage>) -> Unit) {
+                val embedded = collageJSONObject.getJSONObject("_embedded")
+                val collage: JSONArray = embedded.getJSONArray("collage")
+                val result = ArrayList<Collage>()
+                for (i in 0 until collage.length()) {
+                    val name = collage.getJSONObject(i).getString("name")
+                    val links = collage.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Collage(id, name))
+                }
+                successCallback(result)
+            }
+
+            fun getCollage(context: Context, successCallBack: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
+
+                val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
+
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                        Response.Listener<JSONObject> { processCollageData(it, successCallBack) },
+                        Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+
+            }
+
+            private fun processCollageData(collageJSONObject: JSONObject, successCallback: (Collage) -> Unit) {
+                val name = collageJSONObject.getString("name")
+                val links = collageJSONObject.getJSONObject("_links")
                 val self = links.getJSONObject("self")
                 val href = self.getString("href")
                 val id = href.split("/").last().toLong()
-                result.add(Student(id, name))
+                successCallback(Collage(id, name))
             }
-            successCallback(result)
-        }
 
+            fun postCollage(collage: Collage, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val name = mapOf(Pair("name", collage.name))
+                val jsonObject = JSONObject(name)
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
+                        Response.Listener { successCallBack() },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun deleteCollages(collages: List<Collage>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val requestQueue = Volley.newRequestQueue(context)
+                collages.map {
+                    val id = it.id
+                    val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
+                            null,
+                            Response.Listener<JSONObject> { successCallback() },
+                            Response.ErrorListener { errorCallback(it) })
+                    requestQueue.add(request)
+                }
+            }
+
+            fun patchCollage(collage: Collage, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf(Pair("name", collage.name))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${collage.id}", jsonObject,
+                        Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+        }
+    }
+
+    class MajorRequester {
+        companion object {
+            fun getMajors(page: Int, size: Int, context: Context, callback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val url = "$apiDomain/major"
+                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                        null,
+                        Response.Listener<JSONObject> { processMajorsData(it, callback) },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            private fun processMajorsData(majorJSONObject: JSONObject, successCallback: (List<Major>) -> Unit) {
+                val embedded = majorJSONObject.getJSONObject("_embedded")
+                val student: JSONArray = embedded.getJSONArray("major")
+                val result = ArrayList<Major>()
+                for (i in 0 until student.length()) {
+                    val name = student.getJSONObject(i).getString("name")
+                    val links = student.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Major(id, name))
+                }
+                successCallback(result)
+            }
+        }
     }
 
 }

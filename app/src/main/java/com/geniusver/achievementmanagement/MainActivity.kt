@@ -22,13 +22,25 @@
 
 package com.geniusver.achievementmanagement
 
+import android.app.Activity
+import android.app.SearchManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.support.v4.view.GravityCompat
+import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.SearchView
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Identifiable {
+    override val identifier: Int
+        get() = 1
+
+    var currentTab = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,20 +52,90 @@ class MainActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
         }
 
+        val refreshList = ArrayList<() -> Unit>()
+
         viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
-            addFragment(ContentFragment<StudentRecyclerAdapter.StudentViewHolder, Student>().apply {
-                multiChoiceToolbar =  newMultiChoiceToolbar()
-                mAdapter = StudentRecyclerAdapter(applicationContext)
+
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.CollageRecyclerAdapter.CollageViewHolder, com.geniusver.achievementmanagement.Collage>().apply {
+                mAdapter = com.geniusver.achievementmanagement.CollageRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Collage")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.MajorRecyclerAdapter.MajorViewHolder, com.geniusver.achievementmanagement.Major>().apply {
+                mAdapter = com.geniusver.achievementmanagement.MajorRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Major")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.StudentRecyclerAdapter.StudentViewHolder, com.geniusver.achievementmanagement.Student>().apply {
+                mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
             }, "Student")
         }
 
+
         tabs.setupWithViewPager(viewpaper)
 
+        refresh.setOnClickListener {
+            refreshList.map { it() }
+        }
+
     }
 
-    fun newMultiChoiceToolbar(): MultiChoiceToolbar{
-        return MultiChoiceToolbar.Builder(this , toolbar)
-                .setTitles(toolbar.title.toString(),"item selected")
-                .setDefaultIcon(R.drawable.ic_menu, { drawer_layout.openDrawer(GravityCompat.START) }).build()
+    fun newMultiChoiceToolbar(): MultiChoiceToolbar {
+        return MultiChoiceToolbar.Builder(this, toolbar)
+                .setTitles(toolbar.title.toString(), "item selected")
+                .setDefaultIcon(R.drawable.ic_menu, {}).build()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.search_menu, menu)
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu?.findItem(R.id.search)?.actionView as SearchView
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+        tabs.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                currentTab = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+                searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+            }
+
+        })
+        currentTab = tabs.getTabAt(0)?.text.toString()
+
+        return true
+    }
+
+    override fun startActivity(intent: Intent?) {
+        if (Intent.ACTION_SEARCH == intent?.action) {
+            intent.putExtra(IntentKey.TYPE, currentTab.toLowerCase())
+        }
+        super.startActivity(intent)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            R.id.menu_add ->{
+                appendOnClick(this, currentTab.toLowerCase())
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode) {
+            identifier -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    refresh.callOnClick()
+                } else {
+                    Toast.makeText(this, "response failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
 }

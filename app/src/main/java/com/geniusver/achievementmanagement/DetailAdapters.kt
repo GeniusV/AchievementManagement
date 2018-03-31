@@ -22,20 +22,29 @@
 
 package com.geniusver.achievementmanagement
 
+import android.content.Context
+import com.android.volley.VolleyError
+
 /**
- * Created by GeniusV on 3/24/18.
+ * Created by GeniusV on 3/28/18.
  */
+class CollageDetailAdapter(context: Context, val collage: Collage) : DetailAdapter<Collage>(context, collage) {
+    override val id: Long
+        get() = collage.id
 
-data class Student(val id: Long, val name: String) : Data()
+    override fun generateList() {
+        values = listOf(
+                DetailAdapter.DetailData("ID: " + entity.id, false),
+                DetailAdapter.DetailData("Name: " + entity.name, false)
+        )
+        notifyDataSetChanged()
+    }
 
-data class Claxx(val id: Long, val name: String) : Data()
+    override fun getItemCount(): Int {
+        return 2
+    }
 
-data class Course(val id: Long, val name: String) : Data()
-
-data class Major(val id: Long, val name: String) : Data()
-
-data class Score(val id: Long, val studentName: String, val courseName: String, val term: String) : Data()
-
-data class Term(val id: Long, val value: String) : Data()
-
-data class Collage(val id:Long, val name: String): Data()
+    override fun queryDetail(successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.CollageRequester.getCollage(context, successCallback, errorCallback,id)
+    }
+}

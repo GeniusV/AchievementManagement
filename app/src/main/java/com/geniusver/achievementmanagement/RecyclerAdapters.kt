@@ -23,25 +23,26 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
-import com.bumptech.glide.Glide
 
 /**
  * Created by GeniusV on 3/24/18.
  */
 
 class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<StudentRecyclerAdapter.StudentViewHolder, Student>(context) {
-    override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.getStudents(page, size, context, ::add, ::errorHandle)
+    override fun performDelete(data: List<Student>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override val listItemRecourse: Int
-        get() = R.layout.student_list
+    override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.StudentRequester.getStudents(page, size, context, ::add, ::errorHandle)
+    }
 
     override fun newViewHolder(view: View): StudentViewHolder {
         return StudentViewHolder(view)
@@ -52,17 +53,14 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
         holder?.apply {
             student = mStudent
             textView.text = mStudent.name
-//            Glide.with(holder.imageView.context)
-//                    .load(R.drawable.ic_student)
-//                    .fitCenter()
-//                    .into(holder.imageView)
+            imageView.setImageResource(R.drawable.ic_student)
         }
         super.onBindViewHolder(holder, position)
     }
 
     override fun defaultItemViewClickListener(holder: StudentViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            Toast.makeText(context, "item clicked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "student clicked", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -70,7 +68,95 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
         val view = view
         var student: Student? = null
         var imageView = view.findViewById<ImageView>(R.id.avater)
-        var textView = view.findViewById<TextView>(R.id.stu_name)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}
+
+
+class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<CollageRecyclerAdapter.CollageViewHolder, Collage>(context) {
+    override fun performDelete(data: List<Collage>) {
+        RequestCenter.CollageRequester.deleteCollages(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
+    override fun queryData(page: Int, size: Int, successCallback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.CollageRequester.getCollages(page, size, context, ::add, ::errorHandle)
+    }
+
+
+    override fun newViewHolder(view: View): CollageViewHolder {
+        return CollageViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: CollageViewHolder?, position: Int) {
+        var mCollage = values[position] as Collage
+        holder?.apply {
+            collage = mCollage
+            textView.text = mCollage.name
+            imageView.setImageResource(R.drawable.ic_collage)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: CollageViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            val  context = holder?.view?.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra(IntentKey.ITEM, holder?.collage)
+            intent.putExtra(IntentKey.TYPE, "collage")
+            context?.startActivity(intent)
+        }
+    }
+
+//    override fun deleteSelectedData() {
+//        val collages = selectedItemList.map {
+//            values[it]
+//        }
+//    }
+
+
+
+    class CollageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var collage: Collage? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}
+
+class MajorRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<MajorRecyclerAdapter.MajorViewHolder, Major>(context) {
+    override fun performDelete(data: List<Major>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun queryData(page: Int, size: Int, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.MajorRequester.getMajors(page, size, context, ::add, ::errorHandle)
+    }
+
+
+    override fun newViewHolder(view: View): MajorViewHolder {
+        return MajorViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: MajorViewHolder?, position: Int) {
+        var mMajor = values[position] as Major
+        holder?.apply {
+            major = mMajor
+            textView.text = mMajor.name
+            imageView.setImageResource(R.drawable.ic_major)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: MajorViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            Toast.makeText(context, "major clicked", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    class MajorViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var major: Major? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
 }

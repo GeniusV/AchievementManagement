@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2018 GeniusV
   ~
@@ -20,7 +21,27 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">AchievementManagement</string>
-    <string name="search_hint">Search</string>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+            android:id="@+id/menu_trash"
+            android:title="trash"
+            android:icon="@drawable/ic_trash"
+            app:showAsAction="collapseActionView|always"
+            android:visible="false"
+            />
+
+    <item
+            android:id="@+id/menu_add"
+            android:title="add"
+            android:icon="@drawable/ic_add"
+            app:showAsAction="collapseActionView|always"/>
+
+    <item
+            android:id="@+id/menu_edit"
+            android:title="edit"
+            android:icon="@drawable/ic_edit"
+            app:showAsAction="collapseActionView|always"
+            android:visible="false"/>
+</menu>
