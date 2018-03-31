@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity(), Identifiable {
         val searchView = menu?.findItem(R.id.search)?.actionView as SearchView
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+        currentTab = tabs.getTabAt(0)?.text.toString()
         tabs.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
@@ -104,14 +105,13 @@ class MainActivity : AppCompatActivity(), Identifiable {
             }
 
         })
-        currentTab = tabs.getTabAt(0)?.text.toString()
 
         return true
     }
 
     override fun startActivity(intent: Intent?) {
         if (Intent.ACTION_SEARCH == intent?.action) {
-            intent.putExtra(IntentKey.TYPE, currentTab.toLowerCase())
+            intent.putExtra(IntentKey.TYPE, getTabString())
         }
         super.startActivity(intent)
     }
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity(), Identifiable {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             R.id.menu_add ->{
-                appendOnClick(this, currentTab.toLowerCase())
+                appendOnClick(this, getTabString())
             }
         }
         return super.onOptionsItemSelected(item)
@@ -136,6 +136,11 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 }
             }
         }
+    }
+
+    fun getTabString(): String {
+        val raw = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+        return raw.toLowerCase()
     }
 
 }
