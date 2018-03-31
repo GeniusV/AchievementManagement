@@ -294,6 +294,10 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
 
     }
 
+    override fun getItemCount(): Int {
+        return values.size
+    }
+
     data class DetailData(val string: String, val isGoEnable: Boolean)
 
 }

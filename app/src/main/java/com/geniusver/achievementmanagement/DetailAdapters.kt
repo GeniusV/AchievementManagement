@@ -44,9 +44,6 @@ class CollageDetailAdapter(context: Context, val collage: Collage) : DetailAdapt
         notifyDataSetChanged()
     }
 
-    override fun getItemCount(): Int {
-        return 2
-    }
 
     override fun queryDetail(successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.CollageRequester.getCollage(context, successCallback, errorCallback, id)
@@ -99,10 +96,6 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
                 DetailAdapter.DetailData("Collage: " + entity.collageName, true)
         )
         notifyDataSetChanged()
-    }
-
-    override fun getItemCount(): Int {
-        return 3
     }
 
     override fun queryDetail(successCallback: (Major) -> Unit, errorCallback: (VolleyError) -> Unit) {
