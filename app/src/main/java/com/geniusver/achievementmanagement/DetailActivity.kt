@@ -92,6 +92,14 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     }, "Course")
                 }
             }
+            "major" -> {
+                val item = intent.getSerializableExtra(IntentKey.ITEM) as Major
+                collapsing_toolbar.title = item.name
+                detail.layoutManager = LinearLayoutManager(this)
+                detail.adapter = MajorDetailAdapter(this, item).apply {
+                    refreshList.add(this::refresh)
+                }
+            }
 
         }
         tabs.setupWithViewPager(viewpaper)

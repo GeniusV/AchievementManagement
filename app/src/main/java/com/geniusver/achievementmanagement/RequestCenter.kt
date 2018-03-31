@@ -23,7 +23,6 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
-import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
@@ -108,7 +107,7 @@ class RequestCenter {
 
             }
 
-            private fun processCollageData(collageJSONObject: JSONObject, successCallback: (Collage) -> Unit) {
+            fun processCollageData(collageJSONObject: JSONObject, successCallback: (Collage) -> Unit) {
                 val name = collageJSONObject.getString("name")
                 val links = collageJSONObject.getJSONObject("_links")
                 val self = links.getJSONObject("self")
@@ -168,6 +167,14 @@ class RequestCenter {
 
             }
 
+
+            fun getMajorCollage(major: Major, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit){
+                val request = JsonObjectRequest(Request.Method.GET, "$url/${major.id}/collage", null,
+                        Response.Listener<JSONObject> { CollageRequester.processCollageData(it, successCallback) },
+                        Response.ErrorListener(errorCallback))
+                Volley.newRequestQueue(context).add(request)
+            }
+
             private fun processMajorsData(majorJSONObject: JSONObject, successCallback: (List<Major>) -> Unit) {
                 val embedded = majorJSONObject.getJSONObject("_embedded")
                 val major: JSONArray = embedded.getJSONArray("major")
@@ -178,7 +185,7 @@ class RequestCenter {
                     val self = links.getJSONObject("self")
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
-                    result.add(Major(id, name))
+                    result.add(Major(id, name, ""))
                 }
                 successCallback(result)
             }
@@ -201,7 +208,7 @@ class RequestCenter {
                 val self = links.getJSONObject("self")
                 val href = self.getString("href")
                 val id = href.split("/").last().toLong()
-                successCallback(Major(id, name))
+                successCallback(Major(id, name, ""))
             }
 
             fun postMajor(major: Major, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
@@ -265,7 +272,7 @@ class RequestCenter {
                     val self = links.getJSONObject("self")
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
-                    result.add(Course(id, name))
+                    result.add(Course(id, name, ""))
                 }
                 successCallback(result)
             }
@@ -288,7 +295,7 @@ class RequestCenter {
                 val self = links.getJSONObject("self")
                 val href = self.getString("href")
                 val id = href.split("/").last().toLong()
-                successCallback(Course(id, name))
+                successCallback(Course(id, name, ""))
             }
 
             fun postCourse(course: Course, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
@@ -321,8 +328,6 @@ class RequestCenter {
             }
         }
     }
-
-
 
 
 }

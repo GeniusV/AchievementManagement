@@ -22,20 +22,27 @@
 
 package com.geniusver.achievementmanagement
 
-/**
- * Created by GeniusV on 3/24/18.
- */
+import android.app.Activity
+import android.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import kotlinx.android.synthetic.main.activity_collage_edit.*
 
-data class Student(val id: Long, val name: String) : Data()
+class MajorEditActivity : AppCompatActivity() {
+    lateinit var action: String
 
-data class Claxx(val id: Long, val name: String) : Data()
 
-data class Course(val id: Long, val name: String, val collageName: String) : Data()
 
-data class Major(val id: Long, val name: String, val collageName: String) : Data()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_major_edit)
+    }
 
-data class Score(val id: Long, val studentName: String, val courseName: String, val term: String) : Data()
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.edit_menu, menu)
+        return true
+    }
 
-data class Term(val id: Long, val value: String) : Data()
-
-data class Collage(val id:Long, val name: String): Data()
+}

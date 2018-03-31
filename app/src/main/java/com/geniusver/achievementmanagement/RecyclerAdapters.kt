@@ -157,7 +157,11 @@ class MajorRecyclerAdapter(context: Context, var collage: Collage? = null) : Bas
 
     override fun defaultItemViewClickListener(holder: MajorViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            Toast.makeText(context, "major clicked", Toast.LENGTH_SHORT).show()
+            val context = holder?.view?.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra(IntentKey.ITEM, holder?.major)
+            intent.putExtra(IntentKey.TYPE, "major")
+            context?.startActivity(intent)
         }
     }
 

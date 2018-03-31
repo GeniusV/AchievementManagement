@@ -23,6 +23,10 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.content.Intent
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import com.android.volley.VolleyError
 
 /**
@@ -45,6 +49,64 @@ class CollageDetailAdapter(context: Context, val collage: Collage) : DetailAdapt
     }
 
     override fun queryDetail(successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.CollageRequester.getCollage(context, successCallback, errorCallback,id)
+        RequestCenter.CollageRequester.getCollage(context, successCallback, errorCallback, id)
     }
 }
+
+class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Major>(context, major) {
+
+    lateinit var mcollage: Collage
+
+    init {
+        ensureCollageName()
+    }
+
+    fun ensureCollageName() {
+        RequestCenter.MajorRequester.getMajorCollage(major, context, ::onCollageNameReceived, ::errorHandle)
+    }
+
+    fun onCollageNameReceived(collage: Collage){
+        mcollage = collage
+        entity = Major(entity.id, entity.name, mcollage.name)
+        generateList()
+    }
+
+    override fun defaultItemViewClickListener(view: View): View.OnClickListener {
+        return View.OnClickListener {
+            if (view.findViewById<TextView>(R.id.detail_text).text.toString().startsWith("Collage") &&
+                    view.findViewById<ImageView>(R.id.detail_icon).visibility == View.VISIBLE) {
+                val intent = Intent(context, DetailActivity::class.java).apply {
+                    putExtra(IntentKey.TYPE, "collage")
+                    putExtra(IntentKey.ITEM, mcollage)
+                }
+                context.startActivity(intent)
+            }
+        }
+    }
+
+    override fun refresh() {
+        ensureCollageName()
+        super.refresh()
+    }
+
+    override val id: Long
+        get() = major.id
+
+    override fun generateList() {
+        values = listOf(
+                DetailAdapter.DetailData("ID: " + entity.id, false),
+                DetailAdapter.DetailData("Name: " + entity.name, false),
+                DetailAdapter.DetailData("Collage: " + entity.collageName, true)
+        )
+        notifyDataSetChanged()
+    }
+
+    override fun getItemCount(): Int {
+        return 3
+    }
+
+    override fun queryDetail(successCallback: (Major) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.MajorRequester.getMajor(context, successCallback, errorCallback, id)
+    }
+}
+

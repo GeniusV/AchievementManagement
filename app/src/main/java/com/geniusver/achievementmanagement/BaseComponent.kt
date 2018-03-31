@@ -254,7 +254,12 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): DetailViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.detail_list, parent, false)
         view.setBackgroundResource(background)
+        view.setOnClickListener(defaultItemViewClickListener(view))
         return DetailViewHolder(view)
+    }
+
+    protected open fun defaultItemViewClickListener(view: View): View.OnClickListener{
+        return View.OnClickListener {  }
     }
 
 
@@ -271,7 +276,7 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 
-    fun refresh() {
+    open fun refresh() {
         queryDetail()
     }
 
@@ -288,7 +293,6 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
         var imageView = view.findViewById<ImageView>(R.id.detail_icon)
 
     }
-
 
     data class DetailData(val string: String, val isGoEnable: Boolean)
 
