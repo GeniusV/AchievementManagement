@@ -69,7 +69,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
         when (type) {
             "collage" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-                collapsing_toolbar.title = item.name
+                collapsing_toolbar.title = "Collage - ${item.name}"
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = CollageDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
@@ -94,7 +94,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
             }
             "major" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Major
-                collapsing_toolbar.title = item.name
+                collapsing_toolbar.title = "Major - ${item.name}"
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = MajorDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
