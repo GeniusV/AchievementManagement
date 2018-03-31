@@ -161,8 +161,6 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     }
 
 
-
-
     override fun getItemCount(): Int {
         return values.size
     }

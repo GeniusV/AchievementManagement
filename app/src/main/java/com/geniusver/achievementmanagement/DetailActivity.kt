@@ -83,6 +83,13 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         refreshList.add(this::refresh)
                         enableEdit = true
                     }, "Major")
+                    addFragment(ContentFragment<CourseRecyclerAdapter.CourseViewHolder, Course>().apply {
+                        mAdapter = CourseRecyclerAdapter(application, item).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                        enableEdit = true
+                    }, "Course")
                 }
             }
 

@@ -23,6 +23,7 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
+import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
@@ -233,6 +234,96 @@ class RequestCenter {
             }
         }
     }
+
+    class CourseRequester {
+        companion object {
+            val url = "$apiDomain/course"
+            fun getCourses(page: Int, size: Int, context: Context, successCallback: (List<Course>) -> Unit, errorCallback: (VolleyError) -> Unit, collage: Collage? = null) {
+                if (collage != null) {
+                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByCollage?page=$page&size=$size&collage=${CollageRequester.url}/${collage.id}",
+                            null,
+                            Response.Listener<JSONObject> { processCoursesData(it, successCallback) },
+                            Response.ErrorListener { errorCallback(it) })
+                    Volley.newRequestQueue(context).add(request)
+                } else {
+                    val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                            null,
+                            Response.Listener<JSONObject> { processCoursesData(it, successCallback) },
+                            Response.ErrorListener { errorCallback(it) })
+                    Volley.newRequestQueue(context).add(request)
+                }
+
+            }
+
+            private fun processCoursesData(courseJSONObject: JSONObject, successCallback: (List<Course>) -> Unit) {
+                val embedded = courseJSONObject.getJSONObject("_embedded")
+                val course: JSONArray = embedded.getJSONArray("course")
+                val result = ArrayList<Course>()
+                for (i in 0 until course.length()) {
+                    val name = course.getJSONObject(i).getString("name")
+                    val links = course.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Course(id, name))
+                }
+                successCallback(result)
+            }
+
+            fun getCourse(context: Context, successCallBack: (Course) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
+
+                val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
+
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                        Response.Listener<JSONObject> { processCourseData(it, successCallBack) },
+                        Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+
+            }
+
+            private fun processCourseData(courseJSONObject: JSONObject, successCallback: (Course) -> Unit) {
+                val name = courseJSONObject.getString("name")
+                val links = courseJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                successCallback(Course(id, name))
+            }
+
+            fun postCourse(course: Course, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val name = mapOf(Pair("name", course.name))
+                val jsonObject = JSONObject(name)
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
+                        Response.Listener { successCallBack() },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun deleteCourses(courses: List<Course>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val requestQueue = Volley.newRequestQueue(context)
+                courses.map {
+                    val id = it.id
+                    val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
+                            null,
+                            Response.Listener<JSONObject> { successCallback() },
+                            Response.ErrorListener { errorCallback(it) })
+                    requestQueue.add(request)
+                }
+            }
+
+            fun patchCourse(course: Course, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf(Pair("name", course.name))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${course.id}", jsonObject,
+                        Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+        }
+    }
+
+
+
 
 }
 

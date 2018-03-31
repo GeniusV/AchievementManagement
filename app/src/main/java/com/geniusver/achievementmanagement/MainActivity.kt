@@ -64,6 +64,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 mAdapter = com.geniusver.achievementmanagement.MajorRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Major")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.CourseRecyclerAdapter.CourseViewHolder, com.geniusver.achievementmanagement.Course>().apply {
+                mAdapter = com.geniusver.achievementmanagement.CourseRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Course")
             addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.StudentRecyclerAdapter.StudentViewHolder, com.geniusver.achievementmanagement.Student>().apply {
                 mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)

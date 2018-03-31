@@ -168,3 +168,46 @@ class MajorRecyclerAdapter(context: Context, var collage: Collage? = null) : Bas
         var textView = view.findViewById<TextView>(R.id.name)
     }
 }
+
+class CourseRecyclerAdapter(context: Context, var collage: Collage? = null) : BaseRecyclerViewAdapter<CourseRecyclerAdapter.CourseViewHolder, Course>(context) {
+
+    init {
+        refresh()
+    }
+
+    override fun performDelete(data: List<Course>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun queryData(page: Int, size: Int, successCallback: (List<Course>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.CourseRequester.getCourses(page, size, context, ::add, ::errorHandle, collage)
+    }
+
+
+    override fun newViewHolder(view: View): CourseViewHolder {
+        return CourseViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: CourseViewHolder?, position: Int) {
+        var mCourse = values[position] as Course
+        holder?.apply {
+            course = mCourse
+            textView.text = mCourse.name
+            imageView.setImageResource(R.drawable.ic_course)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: CourseViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            Toast.makeText(context, "course clicked", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    class CourseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var course: Course? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}
