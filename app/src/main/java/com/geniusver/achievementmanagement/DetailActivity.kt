@@ -77,7 +77,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
 
                 viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
                     addFragment(ContentFragment<MajorRecyclerAdapter.MajorViewHolder, Major>().apply {
-                        mAdapter = MajorRecyclerAdapter(application).apply {
+                        mAdapter = MajorRecyclerAdapter(application, item).apply {
                             setMultiChoiceToolbar(newMultiChoiceToolbar())
                         }
                         refreshList.add(this::refresh)

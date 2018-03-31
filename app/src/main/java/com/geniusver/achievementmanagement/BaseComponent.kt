@@ -158,8 +158,9 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     init {
         context.theme.resolveAttribute(R.attr.selectableItemBackground, typedValue, true)
         background = typedValue.resourceId
-        refresh()
     }
+
+
 
 
     override fun getItemCount(): Int {

@@ -23,7 +23,6 @@
 package com.geniusver.achievementmanagement
 
 import android.content.Context
-import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
@@ -73,10 +72,10 @@ class RequestCenter {
     class CollageRequester {
         companion object {
             val url = "$apiDomain/collage"
-            fun getCollages(page: Int, size: Int, context: Context, callback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+            fun getCollages(page: Int, size: Int, context: Context, successCallback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                         null,
-                        Response.Listener<JSONObject> { processCollagesData(it, callback) },
+                        Response.Listener<JSONObject> { processCollagesData(it, successCallback) },
                         Response.ErrorListener { errorCallback(it) })
                 Volley.newRequestQueue(context).add(request)
             }
@@ -150,28 +149,87 @@ class RequestCenter {
 
     class MajorRequester {
         companion object {
-            fun getMajors(page: Int, size: Int, context: Context, callback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val url = "$apiDomain/major"
-                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
-                        null,
-                        Response.Listener<JSONObject> { processMajorsData(it, callback) },
-                        Response.ErrorListener { errorCallback(it) })
-                Volley.newRequestQueue(context).add(request)
+            val url = "$apiDomain/major"
+            fun getMajors(page: Int, size: Int, context: Context, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit, collage: Collage? = null) {
+                if (collage != null) {
+                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByCollage?page=$page&size=$size&collage=${CollageRequester.url}/${collage.id}",
+                            null,
+                            Response.Listener<JSONObject> { processMajorsData(it, successCallback) },
+                            Response.ErrorListener { errorCallback(it) })
+                    Volley.newRequestQueue(context).add(request)
+                } else {
+                    val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                            null,
+                            Response.Listener<JSONObject> { processMajorsData(it, successCallback) },
+                            Response.ErrorListener { errorCallback(it) })
+                    Volley.newRequestQueue(context).add(request)
+                }
+
             }
 
             private fun processMajorsData(majorJSONObject: JSONObject, successCallback: (List<Major>) -> Unit) {
                 val embedded = majorJSONObject.getJSONObject("_embedded")
-                val student: JSONArray = embedded.getJSONArray("major")
+                val major: JSONArray = embedded.getJSONArray("major")
                 val result = ArrayList<Major>()
-                for (i in 0 until student.length()) {
-                    val name = student.getJSONObject(i).getString("name")
-                    val links = student.getJSONObject(i).getJSONObject("_links")
+                for (i in 0 until major.length()) {
+                    val name = major.getJSONObject(i).getString("name")
+                    val links = major.getJSONObject(i).getJSONObject("_links")
                     val self = links.getJSONObject("self")
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
                     result.add(Major(id, name))
                 }
                 successCallback(result)
+            }
+
+            fun getMajor(context: Context, successCallBack: (Major) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
+
+                val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
+
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                        Response.Listener<JSONObject> { processMajorData(it, successCallBack) },
+                        Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+
+            }
+
+            private fun processMajorData(majorJSONObject: JSONObject, successCallback: (Major) -> Unit) {
+                val name = majorJSONObject.getString("name")
+                val links = majorJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                successCallback(Major(id, name))
+            }
+
+            fun postMajor(major: Major, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val name = mapOf(Pair("name", major.name))
+                val jsonObject = JSONObject(name)
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
+                        Response.Listener { successCallBack() },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun deleteMajors(majors: List<Major>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val requestQueue = Volley.newRequestQueue(context)
+                majors.map {
+                    val id = it.id
+                    val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
+                            null,
+                            Response.Listener<JSONObject> { successCallback() },
+                            Response.ErrorListener { errorCallback(it) })
+                    requestQueue.add(request)
+                }
+            }
+
+            fun patchMajor(major: Major, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf(Pair("name", major.name))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${major.id}", jsonObject,
+                        Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
             }
         }
     }

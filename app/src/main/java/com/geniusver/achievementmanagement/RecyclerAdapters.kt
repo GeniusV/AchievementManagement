@@ -74,6 +74,10 @@ class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Student
 
 
 class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<CollageRecyclerAdapter.CollageViewHolder, Collage>(context) {
+    init {
+        refresh()
+    }
+
     override fun performDelete(data: List<Collage>) {
         RequestCenter.CollageRequester.deleteCollages(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
@@ -99,7 +103,7 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
 
     override fun defaultItemViewClickListener(holder: CollageViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            val  context = holder?.view?.context
+            val context = holder?.view?.context
             val intent = Intent(context, DetailActivity::class.java)
             intent.putExtra(IntentKey.ITEM, holder?.collage)
             intent.putExtra(IntentKey.TYPE, "collage")
@@ -114,7 +118,6 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
 //    }
 
 
-
     class CollageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val view = view
         var collage: Collage? = null
@@ -123,13 +126,18 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
     }
 }
 
-class MajorRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<MajorRecyclerAdapter.MajorViewHolder, Major>(context) {
+class MajorRecyclerAdapter(context: Context, var collage: Collage? = null) : BaseRecyclerViewAdapter<MajorRecyclerAdapter.MajorViewHolder, Major>(context) {
+
+    init {
+        refresh()
+    }
+
     override fun performDelete(data: List<Major>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun queryData(page: Int, size: Int, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.MajorRequester.getMajors(page, size, context, ::add, ::errorHandle)
+        RequestCenter.MajorRequester.getMajors(page, size, context, ::add, ::errorHandle, collage)
     }
 
 
