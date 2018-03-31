@@ -185,7 +185,7 @@ class RequestCenter {
                     val self = links.getJSONObject("self")
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
-                    result.add(Major(id, name, ""))
+                    result.add(Major(id, name, null))
                 }
                 successCallback(result)
             }
@@ -208,7 +208,7 @@ class RequestCenter {
                 val self = links.getJSONObject("self")
                 val href = self.getString("href")
                 val id = href.split("/").last().toLong()
-                successCallback(Major(id, name, ""))
+                successCallback(Major(id, name, null))
             }
 
             fun postMajor(major: Major, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {

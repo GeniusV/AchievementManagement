@@ -22,23 +22,37 @@
 
 package com.geniusver.achievementmanagement
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.Menu
-import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_collage_edit.*
+import kotlinx.android.synthetic.main.activity_major_edit.*
+import kotlinx.android.synthetic.main.edit_header.*
+
 
 class MajorEditActivity : AppCompatActivity() {
     lateinit var action: String
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_major_edit)
+
+        setSupportActionBar(toolbar)
+
+        supportActionBar?.apply {
+            setHomeAsUpIndicator(R.drawable.ic_cancel)
+            setDisplayHomeAsUpEnabled(true)
+            title = "Collage"
+        }
+
+        action = intent.getStringExtra(IntentKey.ACTION)
+
+        if (action == IntentValue.Action.UPDATE) {
+            val major = intent.getSerializableExtra(IntentKey.ITEM) as Collage
+            supportActionBar?.title = "Collage: ${major.id}"
+            major_name.setText(major.name)
+        }
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.edit_menu, menu)

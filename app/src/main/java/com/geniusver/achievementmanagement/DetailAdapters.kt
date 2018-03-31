@@ -64,7 +64,7 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
 
     fun onCollageNameReceived(collage: Collage){
         mcollage = collage
-        entity = Major(entity.id, entity.name, mcollage.name)
+        entity = Major(entity.id, entity.name, collage)
         generateList()
     }
 
@@ -93,7 +93,7 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
         values = listOf(
                 DetailAdapter.DetailData("ID: " + entity.id, false),
                 DetailAdapter.DetailData("Name: " + entity.name, false),
-                DetailAdapter.DetailData("Collage: " + entity.collageName, true)
+                DetailAdapter.DetailData("Collage: " + entity.Collage?.name, true)
         )
         notifyDataSetChanged()
     }
