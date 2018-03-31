@@ -138,6 +138,20 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     }
                 }
             }
+            R.id.menu_add ->{
+                val type = getTabString()
+                var addIntent = Intent()
+                when (type) {
+                    "collage" -> addIntent = Intent(this, CollageEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                    }
+                    "major" -> addIntent = Intent(this, MajorEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Major(0, "", intent.getSerializableExtra(IntentKey.ITEM) as Collage))
+                    }
+                }
+                startActivityForResult(addIntent, identifier)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -163,5 +177,10 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 }
             }
         }
+    }
+
+    fun getTabString(): String {
+        val raw = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+        return raw.toLowerCase()
     }
 }

@@ -46,16 +46,21 @@ class MajorEditActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "collage"
+            title = "Major"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
 
+        val major = intent.getSerializableExtra(IntentKey.ITEM) as Major
+
         if (action == IntentValue.Action.UPDATE) {
-            val major = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-            supportActionBar?.title = "collage: ${major.id}"
-            major_name.setText(major.name)
+            supportActionBar?.title = "Major: ${major.id}"
         }
+
+        if (major.collage != null) {
+            major_collage.setText((major.collage.id).toString())
+        }
+        major_name.setText(major.name)
     }
 
 

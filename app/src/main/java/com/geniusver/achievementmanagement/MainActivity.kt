@@ -124,7 +124,18 @@ class MainActivity : AppCompatActivity(), Identifiable {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             R.id.menu_add ->{
-                appendOnClick(this, getTabString())
+                val type = getTabString()
+                var addIntent = Intent()
+                when (type) {
+                    "collage" -> addIntent = Intent(this, CollageEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                    }
+                    "major" -> addIntent = Intent(this, MajorEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Major(0, "", null))
+                    }
+                }
+                startActivityForResult(addIntent, identifier)
             }
         }
         return super.onOptionsItemSelected(item)

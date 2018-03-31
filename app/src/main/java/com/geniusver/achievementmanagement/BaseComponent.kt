@@ -306,13 +306,4 @@ interface Identifiable {
     val identifier: Int
 }
 
-fun <T> appendOnClick(activity: T, type: String) where T : AppCompatActivity, T : Identifiable {
-    var intent = Intent()
-    when (type) {
-        "collage" -> intent = Intent(activity, CollageEditActivity::class.java).apply { putExtra(IntentKey.ACTION, IntentValue.Action.INSERT) }
-        "major" -> intent = Intent(activity, MajorEditActivity::class.java).apply { putExtra(IntentKey.ACTION, IntentValue.Action.INSERT) }
-    }
-    activity.startActivityForResult(intent, activity.identifier)
-}
-
 
