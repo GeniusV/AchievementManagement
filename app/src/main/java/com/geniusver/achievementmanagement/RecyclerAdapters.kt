@@ -133,7 +133,7 @@ class MajorRecyclerAdapter(context: Context, var collage: Collage? = null) : Bas
     }
 
     override fun performDelete(data: List<Major>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        RequestCenter.MajorRequester.deleteMajors(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
     override fun queryData(page: Int, size: Int, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
@@ -180,7 +180,7 @@ class CourseRecyclerAdapter(context: Context, var collage: Collage? = null) : Ba
     }
 
     override fun performDelete(data: List<Course>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        RequestCenter.CourseRequester.deleteCourses(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
     override fun queryData(page: Int, size: Int, successCallback: (List<Course>) -> Unit, errorCallback: (VolleyError) -> Unit) {

@@ -103,6 +103,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.adapter = MajorDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
                 }
+                //todo
             }
 
         }
@@ -122,6 +123,15 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         val intent = Intent(this, CollageEditActivity::class.java).apply {
                             putExtra(IntentKey.TYPE, "collage")
                             putExtra(IntentKey.ITEM, collage)
+                            putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                        }
+                        startActivityForResult(intent, identifier)
+                    }
+                    "major" ->{
+                        val major = intent.getSerializableExtra(IntentKey.ITEM) as Major
+                        val intent = Intent(this, MajorEditActivity::class.java).apply {
+                            putExtra(IntentKey.TYPE, "major")
+                            putExtra(IntentKey.ITEM, major)
                             putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                         }
                         startActivityForResult(intent, identifier)
