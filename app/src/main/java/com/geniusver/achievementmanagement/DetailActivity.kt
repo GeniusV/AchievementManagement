@@ -58,6 +58,10 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     RequestCenter.CollageRequester.getCollage(this,
                             { collage -> intent.putExtra(IntentKey.ITEM, collage);setupDetail() }, ::showError,
                             id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
+                "major" ->
+                    RequestCenter.MajorRequester.getMajor(this,
+                            { major -> intent.putExtra(IntentKey.ITEM, major);setupDetail() }, ::showError,
+                            id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
             }
         } else {
             setupDetail()
