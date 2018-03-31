@@ -212,8 +212,8 @@ class RequestCenter {
             }
 
             fun postMajor(major: Major, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val name = mapOf(Pair("name", major.name))
-                val jsonObject = JSONObject(name)
+                val data = mapOf(Pair("name", major.name), Pair("collage", "${CollageRequester.url}/${major.Collage!!.id}"))
+                val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
                         Response.Listener { successCallBack() },
                         Response.ErrorListener { errorCallback(it) })
@@ -233,7 +233,7 @@ class RequestCenter {
             }
 
             fun patchMajor(major: Major, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf(Pair("name", major.name))
+                val data = mapOf(Pair("name", major.name), Pair("collage", "${CollageRequester.url}/${major.Collage!!.id}"))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${major.id}", jsonObject,
                         Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
