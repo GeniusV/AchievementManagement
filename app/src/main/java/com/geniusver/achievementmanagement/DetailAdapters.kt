@@ -103,3 +103,58 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
     }
 }
 
+
+class CourseDetailAdapter(context: Context, val course: Course) : DetailAdapter<Course>(context, course) {
+
+    lateinit var mcollage: Collage
+
+    init {
+        ensureCollageName()
+    }
+
+    fun ensureCollageName() {
+        RequestCenter.CourseRequester.getCourseCollage(course, context, ::onCollageNameReceived, ::errorHandle)
+    }
+
+    fun onCollageNameReceived(collage: Collage){
+        mcollage = collage
+        entity = Course(entity.id, entity.name, collage)
+        generateList()
+    }
+
+    override fun defaultItemViewClickListener(view: View): View.OnClickListener {
+        return View.OnClickListener {
+            if (view.findViewById<TextView>(R.id.detail_text).text.toString().startsWith("collage") &&
+                    view.findViewById<ImageView>(R.id.detail_icon).visibility == View.VISIBLE) {
+                val intent = Intent(context, DetailActivity::class.java).apply {
+                    putExtra(IntentKey.TYPE, "collage")
+                    putExtra(IntentKey.ITEM, mcollage)
+                }
+                context.startActivity(intent)
+            }
+        }
+    }
+
+    override fun refresh() {
+        ensureCollageName()
+        super.refresh()
+    }
+
+    override val id: Long
+        get() = course.id
+
+    override fun generateList() {
+        values = listOf(
+                DetailAdapter.DetailData("ID: " + entity.id, false),
+                DetailAdapter.DetailData("Name: " + entity.name, false),
+                DetailAdapter.DetailData("collage: " + entity.collage?.name, true)
+        )
+        notifyDataSetChanged()
+    }
+
+    override fun queryDetail(successCallback: (Course) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.CourseRequester.getCourse(context, successCallback, errorCallback, id)
+    }
+}
+
+

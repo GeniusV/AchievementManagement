@@ -204,7 +204,11 @@ class CourseRecyclerAdapter(context: Context, var collage: Collage? = null) : Ba
 
     override fun defaultItemViewClickListener(holder: CourseViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            TODO("not complete")
+            val context = holder?.view?.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra(IntentKey.ITEM, holder?.course)
+            intent.putExtra(IntentKey.TYPE, "course")
+            context?.startActivity(intent)
         }
     }
 
