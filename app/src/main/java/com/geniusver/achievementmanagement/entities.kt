@@ -30,9 +30,9 @@ data class Student(val id: Long, val name: String) : Data()
 
 data class Claxx(val id: Long, val name: String) : Data()
 
-data class Course(val id: Long, val name: String, val collageName: String) : Data()
+data class Course(val id: Long, val name: String, val collage: Collage?) : Data()
 
-data class Major(val id: Long, val name: String, val Collage: Collage?) : Data()
+data class Major(val id: Long, val name: String, val collage: Collage?) : Data()
 
 data class Score(val id: Long, val studentName: String, val courseName: String, val term: String) : Data()
 

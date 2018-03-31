@@ -46,14 +46,14 @@ class MajorEditActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "Collage"
+            title = "collage"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
 
         if (action == IntentValue.Action.UPDATE) {
             val major = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-            supportActionBar?.title = "Collage: ${major.id}"
+            supportActionBar?.title = "collage: ${major.id}"
             major_name.setText(major.name)
         }
     }
@@ -78,13 +78,13 @@ class MajorEditActivity : AppCompatActivity() {
         val collageId = major_collage.text.toString().trim().toLongOrNull()
         if (collageId == null) {
             AlertDialog.Builder(this).apply {
-                setMessage("Collage ID is not valid.")
+                setMessage("collage ID is not valid.")
                 setPositiveButton("Ok", { _, _ -> Unit })
             }.create().show()
         }
         RequestCenter.CollageRequester.getCollage(this, ::sendMajor, {
             AlertDialog.Builder(this).apply {
-                setMessage("Collage ID: $collageId is not exist.")
+                setMessage("collage ID: $collageId is not exist.")
                 setPositiveButton("Ok", { _, _ -> Unit })
             }.create().show()
         }, id = collageId)

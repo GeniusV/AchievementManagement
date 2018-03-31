@@ -70,7 +70,7 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
 
     override fun defaultItemViewClickListener(view: View): View.OnClickListener {
         return View.OnClickListener {
-            if (view.findViewById<TextView>(R.id.detail_text).text.toString().startsWith("Collage") &&
+            if (view.findViewById<TextView>(R.id.detail_text).text.toString().startsWith("collage") &&
                     view.findViewById<ImageView>(R.id.detail_icon).visibility == View.VISIBLE) {
                 val intent = Intent(context, DetailActivity::class.java).apply {
                     putExtra(IntentKey.TYPE, "collage")
@@ -93,7 +93,7 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
         values = listOf(
                 DetailAdapter.DetailData("ID: " + entity.id, false),
                 DetailAdapter.DetailData("Name: " + entity.name, false),
-                DetailAdapter.DetailData("Collage: " + entity.Collage?.name, true)
+                DetailAdapter.DetailData("collage: " + entity.collage?.name, true)
         )
         notifyDataSetChanged()
     }

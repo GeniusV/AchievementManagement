@@ -204,7 +204,7 @@ class CourseRecyclerAdapter(context: Context, var collage: Collage? = null) : Ba
 
     override fun defaultItemViewClickListener(holder: CourseViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            Toast.makeText(context, "course clicked", Toast.LENGTH_SHORT).show()
+            TODO("not complete")
         }
     }
 

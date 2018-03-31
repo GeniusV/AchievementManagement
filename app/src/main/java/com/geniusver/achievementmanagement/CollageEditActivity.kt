@@ -43,14 +43,14 @@ class CollageEditActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "Collage"
+            title = "collage"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
 
         if (action == IntentValue.Action.UPDATE) {
             val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-            supportActionBar?.title = "Collage: ${collage.id}"
+            supportActionBar?.title = "collage: ${collage.id}"
             collage_name.setText(collage.name)
         }
 

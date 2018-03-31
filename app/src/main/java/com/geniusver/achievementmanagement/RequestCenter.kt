@@ -212,7 +212,7 @@ class RequestCenter {
             }
 
             fun postMajor(major: Major, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf(Pair("name", major.name), Pair("collage", "${CollageRequester.url}/${major.Collage!!.id}"))
+                val data = mapOf(Pair("name", major.name), Pair("collage", "${CollageRequester.url}/${major.collage!!.id}"))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
                         Response.Listener { successCallBack() },
@@ -233,7 +233,7 @@ class RequestCenter {
             }
 
             fun patchMajor(major: Major, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf(Pair("name", major.name), Pair("collage", "${CollageRequester.url}/${major.Collage!!.id}"))
+                val data = mapOf(Pair("name", major.name), Pair("collage", "${CollageRequester.url}/${major.collage!!.id}"))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${major.id}", jsonObject,
                         Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
@@ -241,6 +241,7 @@ class RequestCenter {
             }
         }
     }
+
 
     class CourseRequester {
         companion object {
@@ -262,6 +263,14 @@ class RequestCenter {
 
             }
 
+
+            fun getCourseCollage(course: Course, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit){
+                val request = JsonObjectRequest(Request.Method.GET, "$url/${course.id}/collage", null,
+                        Response.Listener<JSONObject> { CollageRequester.processCollageData(it, successCallback) },
+                        Response.ErrorListener(errorCallback))
+                Volley.newRequestQueue(context).add(request)
+            }
+
             private fun processCoursesData(courseJSONObject: JSONObject, successCallback: (List<Course>) -> Unit) {
                 val embedded = courseJSONObject.getJSONObject("_embedded")
                 val course: JSONArray = embedded.getJSONArray("course")
@@ -272,7 +281,7 @@ class RequestCenter {
                     val self = links.getJSONObject("self")
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
-                    result.add(Course(id, name, ""))
+                    result.add(Course(id, name, null))
                 }
                 successCallback(result)
             }
@@ -295,12 +304,12 @@ class RequestCenter {
                 val self = links.getJSONObject("self")
                 val href = self.getString("href")
                 val id = href.split("/").last().toLong()
-                successCallback(Course(id, name, ""))
+                successCallback(Course(id, name, null))
             }
 
             fun postCourse(course: Course, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val name = mapOf(Pair("name", course.name))
-                val jsonObject = JSONObject(name)
+                val data = mapOf(Pair("name", course.name), Pair("collage", "${CollageRequester.url}/${course.collage!!.id}"))
+                val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
                         Response.Listener { successCallBack() },
                         Response.ErrorListener { errorCallback(it) })
@@ -320,7 +329,7 @@ class RequestCenter {
             }
 
             fun patchCourse(course: Course, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf(Pair("name", course.name))
+                val data = mapOf(Pair("name", course.name), Pair("collage", "${CollageRequester.url}/${course.collage!!.id}"))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${course.id}", jsonObject,
                         Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
@@ -328,8 +337,6 @@ class RequestCenter {
             }
         }
     }
-
-
 }
 
 
