@@ -28,6 +28,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.geniusver.achievementmanagement.RequestCenter.Companion.apiDomain
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -96,15 +97,12 @@ class RequestCenter {
             }
 
             fun getCollage(context: Context, successCallBack: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
-
                 val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
-
                 val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processCollageData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
                 Volley.newRequestQueue(context).add(request)
-
             }
 
             fun processCollageData(collageJSONObject: JSONObject, successCallback: (Collage) -> Unit) {
@@ -127,11 +125,11 @@ class RequestCenter {
 
             fun deleteCollages(collages: List<Collage>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val requestQueue = Volley.newRequestQueue(context)
-                collages.map {
-                    val id = it.id
+                collages.forEachIndexed { index, collage ->
+                    val id = collage.id
                     val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
                             null,
-                            Response.Listener<JSONObject> { successCallback() },
+                            Response.Listener<JSONObject> { if(index == collages.lastIndex) successCallback() },
                             Response.ErrorListener { errorCallback(it) })
                     requestQueue.add(request)
                 }
@@ -222,11 +220,11 @@ class RequestCenter {
 
             fun deleteMajors(majors: List<Major>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val requestQueue = Volley.newRequestQueue(context)
-                majors.map {
-                    val id = it.id
+                majors.forEachIndexed { index, major ->
+                    val id = major.id
                     val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
                             null,
-                            Response.Listener<JSONObject> { successCallback() },
+                            Response.Listener<JSONObject> { if(index == majors.lastIndex) successCallback() },
                             Response.ErrorListener { errorCallback(it) })
                     requestQueue.add(request)
                 }
@@ -318,11 +316,11 @@ class RequestCenter {
 
             fun deleteCourses(courses: List<Course>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val requestQueue = Volley.newRequestQueue(context)
-                courses.map {
-                    val id = it.id
+                courses.forEachIndexed { index, course ->
+                    val id = course.id
                     val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
                             null,
-                            Response.Listener<JSONObject> { successCallback() },
+                            Response.Listener<JSONObject> { if(index == courses.lastIndex) successCallback() },
                             Response.ErrorListener { errorCallback(it) })
                     requestQueue.add(request)
                 }
