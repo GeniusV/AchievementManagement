@@ -23,14 +23,9 @@
 package com.geniusver.achievementmanagement
 
 import android.app.Activity
-import android.app.SearchManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.SearchView
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceToolbar
@@ -103,8 +98,8 @@ class MainActivity : AppCompatActivity(), Identifiable {
 
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
-            R.id.menu_add ->{
+        when (item?.itemId) {
+            R.id.menu_add -> {
                 val type = getTabString()
                 var addIntent = Intent()
                 when (type) {
@@ -119,6 +114,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                         putExtra(IntentKey.ITEM, Course(0, "", null))
                     }
+                    "claxx" -> addIntent = Intent(this, ClaxxEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Claxx(0, "", null))
+                    }
                 }
                 startActivityForResult(addIntent, identifier)
             }
@@ -127,7 +126,7 @@ class MainActivity : AppCompatActivity(), Identifiable {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
+        when (requestCode) {
             identifier -> {
                 if (resultCode == Activity.RESULT_OK) {
                     refresh.callOnClick()

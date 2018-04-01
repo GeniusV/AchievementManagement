@@ -172,6 +172,15 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         }
                         startActivityForResult(intent, identifier)
                     }
+                    "claxx" ->{
+                        val claxx = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
+                        val intent = Intent(this, ClaxxEditActivity::class.java).apply {
+                            putExtra(IntentKey.TYPE, "claxx")
+                            putExtra(IntentKey.ITEM, claxx)
+                            putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                        }
+                        startActivityForResult(intent, identifier)
+                    }
 
                 }
             }
@@ -190,6 +199,11 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                         putExtra(IntentKey.ITEM, Course(0, "", intent.getSerializableExtra(IntentKey.ITEM) as Collage))
                     }
+                    "claxx" -> addIntent = Intent(this, ClaxxEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Claxx(0, "", intent.getSerializableExtra(IntentKey.ITEM) as Major))
+                    }
+
                 }
                 startActivityForResult(addIntent, identifier)
             }

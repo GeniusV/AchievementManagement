@@ -43,6 +43,8 @@
         </activity>
         <activity android:name=".CourseEditActivity">
         </activity>
+        <activity android:name=".ClaxxEditActivity">
+        </activity>
     </application>
 
 </manifest>
