@@ -89,29 +89,29 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 .setDefaultIcon(R.drawable.ic_menu, {}).build()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.search_menu, menu)
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu?.findItem(R.id.search)?.actionView as SearchView
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
-        currentTab = tabs.getTabAt(0)?.text.toString()
-        tabs.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-            }
-
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                currentTab = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
-                searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
-            }
-
-        })
-
-        return true
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.search_menu, menu)
+//        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+//        val searchView = menu?.findItem(R.id.search)?.actionView as SearchView
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+//        searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+//        currentTab = tabs.getTabAt(0)?.text.toString()
+//        tabs.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
+//            override fun onTabReselected(tab: TabLayout.Tab?) {
+//            }
+//
+//            override fun onTabUnselected(tab: TabLayout.Tab?) {
+//            }
+//
+//            override fun onTabSelected(tab: TabLayout.Tab?) {
+//                currentTab = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+//                searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+//            }
+//
+//        })
+//
+//        return true
+//    }
 
     override fun startActivity(intent: Intent?) {
         if (Intent.ACTION_SEARCH == intent?.action) {

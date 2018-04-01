@@ -183,4 +183,12 @@ class DetailActivity : AppCompatActivity(), Identifiable {
         val raw = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
         return raw.toLowerCase()
     }
+
+
+    override fun startActivity(intent: Intent?) {
+        if (Intent.ACTION_SEARCH == intent?.action) {
+            intent.putExtra(IntentKey.TYPE, getTabString())
+        }
+        super.startActivity(intent)
+    }
 }
