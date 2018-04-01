@@ -123,29 +123,32 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
 
         })
 
-        if (enableEdit) menu?.findItem(R.id.menu_edit)?.isVisible = true
+        if (enableEdit) menu.findItem(R.id.menu_edit)?.isVisible = true
         mAdapter.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener {
             override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
-                menu?.findItem(R.id.menu_trash)?.isVisible = false
-                menu?.findItem(R.id.menu_add)?.isVisible = true
-                menu?.findItem(R.id.search)?.isVisible = true
+                menu.findItem(R.id.menu_trash)?.isVisible = false
+                menu.findItem(R.id.menu_add)?.isVisible = true
+                menu.findItem(R.id.search)?.isVisible = true
+                menu.findItem(R.id.menu_edit)?.isVisible = true
             }
 
             override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
             }
 
             override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
-                menu?.findItem(R.id.menu_trash)?.isVisible = true
-                menu?.findItem(R.id.menu_add)?.isVisible = false
-                menu?.findItem(R.id.search)?.isVisible = false
+                menu.findItem(R.id.menu_trash)?.isVisible = true
+                menu.findItem(R.id.menu_add)?.isVisible = false
+                menu.findItem(R.id.menu_edit)?.isVisible = false
+                menu.findItem(R.id.search)?.isVisible = false
 
             }
 
             override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
                 if (itemSelectedCount == 0) {
-                    menu?.findItem(R.id.menu_trash)?.isVisible = false
-                    menu?.findItem(R.id.menu_add)?.isVisible = true
-                    menu?.findItem(R.id.search)?.isVisible = true
+                    menu.findItem(R.id.menu_trash)?.isVisible = false
+                    menu.findItem(R.id.menu_add)?.isVisible = true
+                    menu.findItem(R.id.menu_edit)?.isVisible = true
+                    menu.findItem(R.id.search)?.isVisible = true
                 }
             }
 
