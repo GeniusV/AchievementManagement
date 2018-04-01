@@ -24,41 +24,41 @@ package com.geniusver.achievementmanagement
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_major_edit.*
+import kotlinx.android.synthetic.main.activity_course_edit.*
 import kotlinx.android.synthetic.main.edit_header.*
 
 
-class MajorEditActivity : AppCompatActivity() {
+class CourseEditActivity : AppCompatActivity() {
     lateinit var action: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_major_edit)
+        setContentView(R.layout.activity_course_edit)
 
         setSupportActionBar(toolbar)
 
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "Major"
+            title = "Course"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
 
-        val major = intent.getSerializableExtra(IntentKey.ITEM) as Major
+        val course = intent.getSerializableExtra(IntentKey.ITEM) as Course
 
         if (action == IntentValue.Action.UPDATE) {
-            supportActionBar?.title = "Major: ${major.id}"
+            supportActionBar?.title = "Course: ${course.id}"
         }
 
-        if (major.collage != null) {
-            major_collage.setText((major.collage.id).toString())
+        if (course.collage != null) {
+            course_collage.setText((course.collage.id).toString())
         }
-        major_name.setText(major.name)
+        course_name.setText(course.name)
     }
 
 
@@ -78,14 +78,14 @@ class MajorEditActivity : AppCompatActivity() {
     }
 
     fun checkCollage() {
-        val collageId = major_collage.text.toString().trim().toLongOrNull()
+        val collageId = course_collage.text.toString().trim().toLongOrNull()
         if (collageId == null) {
             AlertDialog.Builder(this).apply {
                 setMessage("collage ID is not valid.")
                 setPositiveButton("Ok", { _, _ -> Unit })
             }.create().show()
         }
-        RequestCenter.CollageRequester.getCollage(this, ::sendMajor, {
+        RequestCenter.CollageRequester.getCollage(this, ::sendCourse, {
             AlertDialog.Builder(this).apply {
                 setMessage("collage ID: $collageId is not exist.")
                 setPositiveButton("Ok", { _, _ -> Unit })
@@ -94,9 +94,9 @@ class MajorEditActivity : AppCompatActivity() {
     }
 
 
-    fun sendMajor(collage: Collage) {
+    fun sendCourse(collage: Collage) {
         if (action == IntentValue.Action.INSERT) {
-            RequestCenter.MajorRequester.postMajor(Major(0, major_name.text.toString(), collage), applicationContext,
+            RequestCenter.CourseRequester.postCourse(Course(0, course_name.text.toString(), collage), applicationContext,
                     { setResult(Activity.RESULT_OK); finish() }, {
                 AlertDialog.Builder(this).apply {
                     setMessage("Name already exists!!")
@@ -104,8 +104,8 @@ class MajorEditActivity : AppCompatActivity() {
                 }.create().show()
             })
         } else {
-            val major = intent.getSerializableExtra(IntentKey.ITEM) as Major
-            RequestCenter.MajorRequester.patchMajor(Major(major.id, major_name.text.toString(), collage), applicationContext,
+            val course = intent.getSerializableExtra(IntentKey.ITEM) as Course
+            RequestCenter.CourseRequester.patchCourse(Course(course.id, course_name.text.toString(), collage), applicationContext,
                     { setResult(Activity.RESULT_OK); finish() }, {
                 AlertDialog.Builder(this).apply {
                     setMessage("Name already exists!!")

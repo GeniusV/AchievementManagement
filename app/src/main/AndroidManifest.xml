@@ -41,6 +41,8 @@
         </activity>
         <activity android:name=".MajorEditActivity">
         </activity>
+        <activity android:name=".CourseEditActivity">
+        </activity>
     </application>
 
 </manifest>

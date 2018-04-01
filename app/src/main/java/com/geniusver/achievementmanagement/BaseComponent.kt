@@ -39,7 +39,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
-import kotlinx.android.synthetic.main.activity_main.*
 import java.io.Serializable
 
 /**
@@ -110,7 +109,7 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
         val tabs = activity.findViewById<TabLayout>(R.id.tabs)
         searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.componentName))
         searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
-        tabs.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
+        tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
 

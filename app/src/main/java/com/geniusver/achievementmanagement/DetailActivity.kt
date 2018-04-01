@@ -62,6 +62,10 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     RequestCenter.MajorRequester.getMajor(this,
                             { major -> intent.putExtra(IntentKey.ITEM, major);setupDetail() }, ::showError,
                             id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
+                "course" ->
+                    RequestCenter.CourseRequester.getCourse(this,
+                            { course -> intent.putExtra(IntentKey.ITEM, course);setupDetail() }, ::showError,
+                            id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
             }
         } else {
             setupDetail()
@@ -106,6 +110,16 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 //todo
             }
 
+            "course" -> {
+                val item = intent.getSerializableExtra(IntentKey.ITEM) as Course
+                collapsing_toolbar.title = "Course - ${item.name}"
+                detail.layoutManager = LinearLayoutManager(this)
+                detail.adapter = CourseDetailAdapter(this, item).apply {
+                    refreshList.add(this::refresh)
+                }
+                //todo
+            }
+
         }
         tabs.setupWithViewPager(viewpaper)
         refresh.setOnClickListener {
@@ -136,6 +150,16 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         }
                         startActivityForResult(intent, identifier)
                     }
+                    "course" ->{
+                        val course = intent.getSerializableExtra(IntentKey.ITEM) as Course
+                        val intent = Intent(this, CourseEditActivity::class.java).apply {
+                            putExtra(IntentKey.TYPE, "course")
+                            putExtra(IntentKey.ITEM, course)
+                            putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                        }
+                        startActivityForResult(intent, identifier)
+                    }
+
                 }
             }
             R.id.menu_add ->{
@@ -148,6 +172,10 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     "major" -> addIntent = Intent(this, MajorEditActivity::class.java).apply {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                         putExtra(IntentKey.ITEM, Major(0, "", intent.getSerializableExtra(IntentKey.ITEM) as Collage))
+                    }
+                    "course" -> addIntent = Intent(this, CourseEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Course(0, "", intent.getSerializableExtra(IntentKey.ITEM) as Collage))
                     }
                 }
                 startActivityForResult(addIntent, identifier)

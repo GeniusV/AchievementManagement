@@ -134,6 +134,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                         putExtra(IntentKey.ITEM, Major(0, "", null))
                     }
+                    "course" -> addIntent = Intent(this, CourseEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Course(0, "", null))
+                    }
                 }
                 startActivityForResult(addIntent, identifier)
             }
