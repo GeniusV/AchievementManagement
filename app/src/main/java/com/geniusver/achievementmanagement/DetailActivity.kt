@@ -70,6 +70,10 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     RequestCenter.ClaxxRequester.getClaxx(this,
                             { claxx -> intent.putExtra(IntentKey.ITEM, claxx);setupDetail() }, ::showError,
                             id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
+                "student" ->
+                    RequestCenter.StudentRequester.getStudent(this,
+                            { student -> intent.putExtra(IntentKey.ITEM, student);setupDetail() }, ::showError,
+                            id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
             }
         } else {
             setupDetail()
@@ -111,7 +115,16 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.adapter = MajorDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
                 }
-                //todo
+
+                viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
+                    addFragment(ContentFragment<ClaxxRecyclerAdapter.ClaxxViewHolder, Claxx>().apply {
+                        mAdapter = ClaxxRecyclerAdapter(application, item).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                        enableEdit = true
+                    }, "Claxx")
+                }
             }
 
             "course" -> {
@@ -121,7 +134,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.adapter = CourseDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
                 }
-                //todo
+                TODO()
             }
             "claxx" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
@@ -132,7 +145,15 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 }
                 //todo
             }
-
+            "student" -> {
+                val item = intent.getSerializableExtra(IntentKey.ITEM) as Student
+                collapsing_toolbar.title = "Student - ${item.name}"
+                detail.layoutManager = LinearLayoutManager(this)
+                detail.adapter = StudentDetailAdapter(this, item).apply {
+                    refreshList.add(this::refresh)
+                }
+                TODO()
+            }
         }
         tabs.setupWithViewPager(viewpaper)
         refresh.setOnClickListener {
@@ -181,7 +202,15 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         }
                         startActivityForResult(intent, identifier)
                     }
-
+                    "student" ->{
+                        val student = intent.getSerializableExtra(IntentKey.ITEM) as Student
+                        val intent = Intent(this, StudentEditActivity::class.java).apply {
+                            putExtra(IntentKey.TYPE, "student")
+                            putExtra(IntentKey.ITEM, student)
+                            putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                        }
+                        startActivityForResult(intent, identifier)
+                    }
                 }
             }
             R.id.menu_add ->{
@@ -203,7 +232,10 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                         putExtra(IntentKey.ITEM, Claxx(0, "", intent.getSerializableExtra(IntentKey.ITEM) as Major))
                     }
-
+                    "student" -> addIntent = Intent(this, StudentEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Student(0, "", intent.getSerializableExtra(IntentKey.ITEM) as Claxx))
+                    }
                 }
                 startActivityForResult(addIntent, identifier)
             }

@@ -35,44 +35,6 @@ import com.android.volley.VolleyError
  * Created by GeniusV on 3/24/18.
  */
 
-class StudentRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<StudentRecyclerAdapter.StudentViewHolder, Student>(context) {
-    override fun performDelete(data: List<Student>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.StudentRequester.getStudents(page, size, context, ::add, ::errorHandle)
-    }
-
-    override fun newViewHolder(view: View): StudentViewHolder {
-        return StudentViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: StudentViewHolder?, position: Int) {
-        var mStudent = values[position] as Student
-        holder?.apply {
-            student = mStudent
-            textView.text = mStudent.name
-            imageView.setImageResource(R.drawable.ic_student)
-        }
-        super.onBindViewHolder(holder, position)
-    }
-
-    override fun defaultItemViewClickListener(holder: StudentViewHolder?, position: Int): View.OnClickListener {
-        return View.OnClickListener {
-            Toast.makeText(context, "student clicked", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    class StudentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val view = view
-        var student: Student? = null
-        var imageView = view.findViewById<ImageView>(R.id.avater)
-        var textView = view.findViewById<TextView>(R.id.name)
-    }
-}
-
-
 class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<CollageRecyclerAdapter.CollageViewHolder, Collage>(context) {
     init {
         refresh()
@@ -266,3 +228,51 @@ class ClaxxRecyclerAdapter(context: Context, var major: Major? = null) : BaseRec
         var textView = view.findViewById<TextView>(R.id.name)
     }
 }
+
+class StudentRecyclerAdapter(context: Context, var claxx: Claxx? = null) : BaseRecyclerViewAdapter<StudentRecyclerAdapter.StudentViewHolder, Student>(context) {
+
+    init {
+        refresh()
+    }
+
+    override fun performDelete(data: List<Student>) {
+        RequestCenter.StudentRequester.deleteStudents(data, context, ::deleteSuccessHandle, ::errorHandle)
+    }
+
+    override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.StudentRequester.getStudents(page, size, context, ::add, ::errorHandle, claxx)
+    }
+
+
+    override fun newViewHolder(view: View): StudentViewHolder {
+        return StudentViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: StudentViewHolder?, position: Int) {
+        var mStudent = values[position] as Student
+        holder?.apply {
+            student = mStudent
+            textView.text = mStudent.name
+            imageView.setImageResource(R.drawable.ic_student)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: StudentViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            val context = holder?.view?.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra(IntentKey.ITEM, holder?.student)
+            intent.putExtra(IntentKey.TYPE, "student")
+            context?.startActivity(intent)
+        }
+    }
+
+    class StudentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var student: Student? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}
+

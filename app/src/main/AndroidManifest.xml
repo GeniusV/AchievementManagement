@@ -45,6 +45,8 @@
         </activity>
         <activity android:name=".ClaxxEditActivity">
         </activity>
+        <activity android:name=".StudentEditActivity">
+        </activity>
     </application>
 
 </manifest>

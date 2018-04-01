@@ -210,4 +210,58 @@ class ClaxxDetailAdapter(context: Context, val claxx: Claxx) : DetailAdapter<Cla
     }
 }
 
+class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapter<Student>(context, student) {
+
+    lateinit var mclaxx: Claxx
+
+    init {
+        ensureClaxxName()
+    }
+
+    fun ensureClaxxName() {
+        RequestCenter.StudentRequester.getStudentClaxx(student, context, ::onClaxxNameReceived, ::errorHandle)
+    }
+
+    fun onClaxxNameReceived(claxx: Claxx){
+        mclaxx = claxx
+        entity = Student(entity.id, entity.name, claxx)
+        generateList()
+    }
+
+    override fun defaultItemViewClickListener(view: View): View.OnClickListener {
+        return View.OnClickListener {
+            if (view.findViewById<TextView>(R.id.detail_text).text.toString().startsWith("claxx") &&
+                    view.findViewById<ImageView>(R.id.detail_icon).visibility == View.VISIBLE) {
+                val intent = Intent(context, DetailActivity::class.java).apply {
+                    putExtra(IntentKey.TYPE, "claxx")
+                    putExtra(IntentKey.ITEM, mclaxx)
+                }
+                context.startActivity(intent)
+            }
+        }
+    }
+
+    override fun refresh() {
+        ensureClaxxName()
+        super.refresh()
+    }
+
+    override val id: Long
+        get() = student.id
+
+    override fun generateList() {
+        values = listOf(
+                DetailAdapter.DetailData("ID: " + entity.id, false),
+                DetailAdapter.DetailData("Name: " + entity.name, false),
+                DetailAdapter.DetailData("claxx: " + entity.claxx?.name, true)
+        )
+        notifyDataSetChanged()
+    }
+
+    override fun queryDetail(successCallback: (Student) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.StudentRequester.getStudent(context, successCallback, errorCallback, id)
+    }
+}
+
+
 

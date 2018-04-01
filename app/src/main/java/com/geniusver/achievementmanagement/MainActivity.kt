@@ -35,8 +35,6 @@ class MainActivity : AppCompatActivity(), Identifiable {
     override val identifier: Int
         get() = 1
 
-    var currentTab = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -117,6 +115,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                     "claxx" -> addIntent = Intent(this, ClaxxEditActivity::class.java).apply {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                         putExtra(IntentKey.ITEM, Claxx(0, "", null))
+                    }
+                    "student" -> addIntent = Intent(this, StudentEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Student(0, "", null))
                     }
                 }
                 startActivityForResult(addIntent, identifier)
