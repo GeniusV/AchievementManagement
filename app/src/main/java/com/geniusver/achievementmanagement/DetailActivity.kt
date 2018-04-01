@@ -76,6 +76,16 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     RequestCenter.StudentRequester.getStudent(this,
                             { student -> intent.putExtra(IntentKey.ITEM, student);setupDetail() }, ::showError,
                             id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
+                "term" ->
+                    RequestCenter.TermRequester.getTerm(this,
+                            { term ->
+                                val intent = Intent(this, TermEditActivity::class.java)
+                                intent.putExtra(IntentKey.ITEM, term)
+                                intent.putExtra(IntentKey.TYPE, "term")
+                                intent.putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                                startActivity(intent)
+                            }, ::showError,
+                            id = query.toLongOrNull(), value = if (query.toLongOrNull() == null) query else "")
             }
         } else {
             setupDetail()

@@ -47,6 +47,8 @@
         </activity>
         <activity android:name=".StudentEditActivity">
         </activity>
+        <activity android:name=".TermEditActivity">
+        </activity>
     </application>
 
 </manifest>

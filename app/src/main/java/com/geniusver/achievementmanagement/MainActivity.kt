@@ -69,6 +69,11 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Student")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.TermRecyclerAdapter.TermViewHolder, com.geniusver.achievementmanagement.Term>().apply {
+                mAdapter = com.geniusver.achievementmanagement.TermRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Term")
+
         }
 
 
@@ -120,6 +125,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                         putExtra(IntentKey.ITEM, Student(0, "", null))
                     }
+                    "term" -> addIntent = Intent(this, TermEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                    }
+
                 }
                 startActivityForResult(addIntent, identifier)
             }

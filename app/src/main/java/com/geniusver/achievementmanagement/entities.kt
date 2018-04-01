@@ -34,7 +34,9 @@ data class Course(val id: Long, val name: String, val collage: Collage?) : Data(
 
 data class Major(val id: Long, val name: String, val collage: Collage?) : Data()
 
-data class Score(val id: Long, val value : Int, val course: Course?, val student: Student?, val term: Term?) : Data()
+class Score(val id: Long, val value : Int, val course: Course, val student: Student, val term: Term) : Data(){
+    val name = "${student.name} - ${course.name} - ${term.value} $value"
+}
 
 data class Term(val id: Long, val value: String) : Data()
 

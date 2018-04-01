@@ -499,6 +499,83 @@ class RequestCenter {
     }
 
 
+    class TermRequester {
+        companion object {
+            val url = "$apiDomain/term"
+            fun getTerms(page: Int, size: Int, context: Context, successCallback: (List<Term>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                        null,
+                        Response.Listener<JSONObject> { processTermsData(it, successCallback) },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            private fun processTermsData(termJSONObject: JSONObject, successCallback: (List<Term>) -> Unit) {
+                val embedded = termJSONObject.getJSONObject("_embedded")
+                val term: JSONArray = embedded.getJSONArray("term")
+                val result = ArrayList<Term>()
+                for (i in 0 until term.length()) {
+                    val value = term.getJSONObject(i).getString("value")
+                    val links = term.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Term(id, value))
+                }
+                successCallback(result)
+            }
+
+            fun getTerm(context: Context, successCallBack: (Term) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, value: String = "") {
+                val requestUrl = if (value == "") "$url/$id" else "$url/search/findByName?value=$value"
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                        Response.Listener<JSONObject> { processTermData(it, successCallBack) },
+                        Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun processTermData(termJSONObject: JSONObject, successCallback: (Term) -> Unit) {
+                val value = termJSONObject.getString("value")
+                val links = termJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                successCallback(Term(id, value))
+            }
+
+            fun postTerm(term: Term, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val value = mapOf(Pair("value", term.value))
+                val jsonObject = JSONObject(value)
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
+                        Response.Listener { successCallBack() },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun deleteTerms(terms: List<Term>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val requestQueue = Volley.newRequestQueue(context)
+                terms.forEachIndexed { index, term ->
+                    val id = term.id
+                    val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
+                            null,
+                            Response.Listener<JSONObject> { if (index == terms.lastIndex) successCallback() },
+                            Response.ErrorListener { errorCallback(it) })
+                    requestQueue.add(request)
+                }
+            }
+
+            fun patchTerm(term: Term, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf(Pair("value", term.value))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${term.id}", jsonObject,
+                        Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+        }
+    }
+
+
+
 }
 
 

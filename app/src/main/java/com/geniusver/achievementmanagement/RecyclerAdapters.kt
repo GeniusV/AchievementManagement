@@ -276,3 +276,52 @@ class StudentRecyclerAdapter(context: Context, var claxx: Claxx? = null) : BaseR
     }
 }
 
+class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecyclerAdapter.TermViewHolder, Term>(context) {
+    init {
+        refresh()
+    }
+
+    override fun performDelete(data: List<Term>) {
+        RequestCenter.TermRequester.deleteTerms(data, context, ::deleteSuccessHandle, ::errorHandle)
+    }
+
+    override fun queryData(page: Int, size: Int, successCallback: (List<Term>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.TermRequester.getTerms(page, size, context, ::add, ::errorHandle)
+    }
+
+
+    override fun newViewHolder(view: View): TermViewHolder {
+        return TermViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: TermViewHolder?, position: Int) {
+        var mTerm = values[position] as Term
+        holder?.apply {
+            term = mTerm
+            textView.text = mTerm.value
+            imageView.setImageResource(R.drawable.ic_term)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: TermViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            val context = holder?.view?.context
+            val intent = Intent(context, TermEditActivity::class.java)
+            intent.putExtra(IntentKey.ITEM, holder?.term)
+            intent.putExtra(IntentKey.TYPE, "term")
+            intent.putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+            context?.startActivity(intent)
+        }
+    }
+
+
+    class TermViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var term: Term? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}
+
+
