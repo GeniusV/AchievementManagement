@@ -406,9 +406,9 @@ class RequestCenter {
     class StudentRequester {
         companion object {
             val url = "$apiDomain/student"
-            fun getStudents(page: Int, size: Int, context: Context, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit, collage: Claxx? = null) {
-                if (collage != null) {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByClaxx?page=$page&size=$size&collage=${ClaxxRequester.url}/${collage.id}",
+            fun getStudents(page: Int, size: Int, context: Context, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit, claxx: Claxx? = null) {
+                if (claxx != null) {
+                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByClaxx?page=$page&size=$size&claxx=${ClaxxRequester.url}/${claxx.id}",
                             null,
                             Response.Listener<JSONObject> { processStudentsData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
@@ -425,7 +425,7 @@ class RequestCenter {
 
 
             fun getStudentClaxx(student: Student, context: Context, successCallback: (Claxx) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url/${student.id}/collage", null,
+                val request = JsonObjectRequest(Request.Method.GET, "$url/${student.id}/claxx", null,
                         Response.Listener<JSONObject> { ClaxxRequester.processClaxxData(it, successCallback) },
                         Response.ErrorListener(errorCallback))
                 Volley.newRequestQueue(context).add(request)
