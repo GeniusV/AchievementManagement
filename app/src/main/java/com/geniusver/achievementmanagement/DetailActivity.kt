@@ -24,6 +24,7 @@ package com.geniusver.achievementmanagement
 
 import android.app.Activity
 import android.app.SearchManager
+import android.content.Entity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -41,6 +42,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
 
     val refreshList = ArrayList<() -> Unit>()
 
+    val entityMap = HashMap<String, () -> Data>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +91,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = CollageDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
+                    entityMap["collage"] = this::entity
                 }
 
                 viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
@@ -114,6 +117,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = MajorDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
+                    entityMap["major"] = this::entity
                 }
 
                 viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
@@ -133,8 +137,9 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = CourseDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
+                    entityMap["course"] = this::entity
                 }
-                TODO()
+                //todo
             }
             "claxx" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
@@ -142,8 +147,18 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = ClaxxDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
+                    entityMap["claxx"] == this::entity
                 }
-                //todo
+                viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
+                    addFragment(ContentFragment<StudentRecyclerAdapter.StudentViewHolder, Student>().apply {
+                        mAdapter = StudentRecyclerAdapter(application, item).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                        enableEdit = true
+                    }, "Student")
+                }
+
             }
             "student" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Student
@@ -151,8 +166,9 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = StudentDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
+                    entityMap["student"] = this::entity
                 }
-                TODO()
+                //TODO()
             }
         }
         tabs.setupWithViewPager(viewpaper)
@@ -166,54 +182,49 @@ class DetailActivity : AppCompatActivity(), Identifiable {
             R.id.menu_edit -> {
                 val type = intent.getStringExtra(IntentKey.TYPE)
                 when (type) {
-                    "collage" ->{
-                        val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
+                    "collage" -> {
                         val intent = Intent(this, CollageEditActivity::class.java).apply {
                             putExtra(IntentKey.TYPE, "collage")
-                            putExtra(IntentKey.ITEM, collage)
+                            putExtra(IntentKey.ITEM, entityMap["collage"]?.invoke())
                             putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                         }
                         startActivityForResult(intent, identifier)
                     }
-                    "major" ->{
-                        val major = intent.getSerializableExtra(IntentKey.ITEM) as Major
+                    "major" -> {
                         val intent = Intent(this, MajorEditActivity::class.java).apply {
                             putExtra(IntentKey.TYPE, "major")
-                            putExtra(IntentKey.ITEM, major)
+                            putExtra(IntentKey.ITEM, entityMap["major"]?.invoke())
                             putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                         }
                         startActivityForResult(intent, identifier)
                     }
-                    "course" ->{
-                        val course = intent.getSerializableExtra(IntentKey.ITEM) as Course
+                    "course" -> {
                         val intent = Intent(this, CourseEditActivity::class.java).apply {
                             putExtra(IntentKey.TYPE, "course")
-                            putExtra(IntentKey.ITEM, course)
+                            putExtra(IntentKey.ITEM, entityMap["course"]?.invoke())
                             putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                         }
                         startActivityForResult(intent, identifier)
                     }
-                    "claxx" ->{
-                        val claxx = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
+                    "claxx" -> {
                         val intent = Intent(this, ClaxxEditActivity::class.java).apply {
                             putExtra(IntentKey.TYPE, "claxx")
-                            putExtra(IntentKey.ITEM, claxx)
+                            putExtra(IntentKey.ITEM, entityMap["claxx"]?.invoke())
                             putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                         }
                         startActivityForResult(intent, identifier)
                     }
-                    "student" ->{
-                        val student = intent.getSerializableExtra(IntentKey.ITEM) as Student
+                    "student" -> {
                         val intent = Intent(this, StudentEditActivity::class.java).apply {
                             putExtra(IntentKey.TYPE, "student")
-                            putExtra(IntentKey.ITEM, student)
+                            putExtra(IntentKey.ITEM, entityMap["student"]?.invoke())
                             putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                         }
                         startActivityForResult(intent, identifier)
                     }
                 }
             }
-            R.id.menu_add ->{
+            R.id.menu_add -> {
                 val type = getTabString()
                 var addIntent = Intent()
                 when (type) {
@@ -255,7 +266,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
+        when (requestCode) {
             identifier -> {
                 if (resultCode == Activity.RESULT_OK) {
                     refresh.callOnClick()
