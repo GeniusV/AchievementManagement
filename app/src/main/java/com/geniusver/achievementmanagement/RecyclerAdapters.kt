@@ -219,3 +219,50 @@ class CourseRecyclerAdapter(context: Context, var collage: Collage? = null) : Ba
         var textView = view.findViewById<TextView>(R.id.name)
     }
 }
+
+class ClaxxRecyclerAdapter(context: Context, var major: Major? = null) : BaseRecyclerViewAdapter<ClaxxRecyclerAdapter.ClaxxViewHolder, Claxx>(context) {
+
+    init {
+        refresh()
+    }
+
+    override fun performDelete(data: List<Claxx>) {
+        RequestCenter.ClaxxRequester.deleteClaxxs(data, context, ::deleteSuccessHandle, ::errorHandle)
+    }
+
+    override fun queryData(page: Int, size: Int, successCallback: (List<Claxx>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.ClaxxRequester.getClaxxs(page, size, context, ::add, ::errorHandle, major)
+    }
+
+
+    override fun newViewHolder(view: View): ClaxxViewHolder {
+        return ClaxxViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ClaxxViewHolder?, position: Int) {
+        var mClaxx = values[position] as Claxx
+        holder?.apply {
+            claxx = mClaxx
+            textView.text = mClaxx.name
+            imageView.setImageResource(R.drawable.ic_claxx)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: ClaxxViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            val context = holder?.view?.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra(IntentKey.ITEM, holder?.claxx)
+            intent.putExtra(IntentKey.TYPE, "claxx")
+            context?.startActivity(intent)
+        }
+    }
+
+    class ClaxxViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var claxx: Claxx? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}

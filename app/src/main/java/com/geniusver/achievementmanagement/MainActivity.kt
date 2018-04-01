@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), Identifiable {
             addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.CollageRecyclerAdapter.CollageViewHolder, com.geniusver.achievementmanagement.Collage>().apply {
                 mAdapter = com.geniusver.achievementmanagement.CollageRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
-            }, "collage")
+            }, "Collage")
             addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.MajorRecyclerAdapter.MajorViewHolder, com.geniusver.achievementmanagement.Major>().apply {
                 mAdapter = com.geniusver.achievementmanagement.MajorRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
@@ -68,6 +68,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 mAdapter = com.geniusver.achievementmanagement.CourseRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Course")
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.ClaxxRecyclerAdapter.ClaxxViewHolder, com.geniusver.achievementmanagement.Claxx>().apply {
+                mAdapter = com.geniusver.achievementmanagement.ClaxxRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Claxx")
             addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.StudentRecyclerAdapter.StudentViewHolder, com.geniusver.achievementmanagement.Student>().apply {
                 mAdapter = com.geniusver.achievementmanagement.StudentRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
@@ -89,29 +93,6 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 .setDefaultIcon(R.drawable.ic_menu, {}).build()
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.search_menu, menu)
-//        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-//        val searchView = menu?.findItem(R.id.search)?.actionView as SearchView
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-//        searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
-//        currentTab = tabs.getTabAt(0)?.text.toString()
-//        tabs.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
-//            override fun onTabReselected(tab: TabLayout.Tab?) {
-//            }
-//
-//            override fun onTabUnselected(tab: TabLayout.Tab?) {
-//            }
-//
-//            override fun onTabSelected(tab: TabLayout.Tab?) {
-//                currentTab = tabs.getTabAt(tabs.selectedTabPosition)?.text as String
-//                searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
-//            }
-//
-//        })
-//
-//        return true
-//    }
 
     override fun startActivity(intent: Intent?) {
         if (Intent.ACTION_SEARCH == intent?.action) {

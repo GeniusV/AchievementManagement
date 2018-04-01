@@ -66,6 +66,10 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     RequestCenter.CourseRequester.getCourse(this,
                             { course -> intent.putExtra(IntentKey.ITEM, course);setupDetail() }, ::showError,
                             id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
+                "claxx" ->
+                    RequestCenter.ClaxxRequester.getClaxx(this,
+                            { claxx -> intent.putExtra(IntentKey.ITEM, claxx);setupDetail() }, ::showError,
+                            id = query.toLongOrNull(), name = if (query.toLongOrNull() == null) query else "")
             }
         } else {
             setupDetail()
@@ -115,6 +119,15 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 collapsing_toolbar.title = "Course - ${item.name}"
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = CourseDetailAdapter(this, item).apply {
+                    refreshList.add(this::refresh)
+                }
+                //todo
+            }
+            "claxx" -> {
+                val item = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
+                collapsing_toolbar.title = "Claxx - ${item.name}"
+                detail.layoutManager = LinearLayoutManager(this)
+                detail.adapter = ClaxxDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
                 }
                 //todo

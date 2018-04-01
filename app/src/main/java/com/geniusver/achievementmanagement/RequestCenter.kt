@@ -28,7 +28,6 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.geniusver.achievementmanagement.RequestCenter.Companion.apiDomain
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -129,7 +128,7 @@ class RequestCenter {
                     val id = collage.id
                     val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
                             null,
-                            Response.Listener<JSONObject> { if(index == collages.lastIndex) successCallback() },
+                            Response.Listener<JSONObject> { if (index == collages.lastIndex) successCallback() },
                             Response.ErrorListener { errorCallback(it) })
                     requestQueue.add(request)
                 }
@@ -166,14 +165,14 @@ class RequestCenter {
             }
 
 
-            fun getMajorCollage(major: Major, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit){
+            fun getMajorCollage(major: Major, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val request = JsonObjectRequest(Request.Method.GET, "$url/${major.id}/collage", null,
                         Response.Listener<JSONObject> { CollageRequester.processCollageData(it, successCallback) },
                         Response.ErrorListener(errorCallback))
                 Volley.newRequestQueue(context).add(request)
             }
 
-            private fun processMajorsData(majorJSONObject: JSONObject, successCallback: (List<Major>) -> Unit) {
+            fun processMajorsData(majorJSONObject: JSONObject, successCallback: (List<Major>) -> Unit) {
                 val embedded = majorJSONObject.getJSONObject("_embedded")
                 val major: JSONArray = embedded.getJSONArray("major")
                 val result = ArrayList<Major>()
@@ -200,7 +199,7 @@ class RequestCenter {
 
             }
 
-            private fun processMajorData(majorJSONObject: JSONObject, successCallback: (Major) -> Unit) {
+            fun processMajorData(majorJSONObject: JSONObject, successCallback: (Major) -> Unit) {
                 val name = majorJSONObject.getString("name")
                 val links = majorJSONObject.getJSONObject("_links")
                 val self = links.getJSONObject("self")
@@ -224,7 +223,7 @@ class RequestCenter {
                     val id = major.id
                     val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
                             null,
-                            Response.Listener<JSONObject> { if(index == majors.lastIndex) successCallback() },
+                            Response.Listener<JSONObject> { if (index == majors.lastIndex) successCallback() },
                             Response.ErrorListener { errorCallback(it) })
                     requestQueue.add(request)
                 }
@@ -262,7 +261,7 @@ class RequestCenter {
             }
 
 
-            fun getCourseCollage(course: Course, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit){
+            fun getCourseCollage(course: Course, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val request = JsonObjectRequest(Request.Method.GET, "$url/${course.id}/collage", null,
                         Response.Listener<JSONObject> { CollageRequester.processCollageData(it, successCallback) },
                         Response.ErrorListener(errorCallback))
@@ -320,7 +319,7 @@ class RequestCenter {
                     val id = course.id
                     val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
                             null,
-                            Response.Listener<JSONObject> { if(index == courses.lastIndex) successCallback() },
+                            Response.Listener<JSONObject> { if (index == courses.lastIndex) successCallback() },
                             Response.ErrorListener { errorCallback(it) })
                     requestQueue.add(request)
                 }
@@ -335,6 +334,102 @@ class RequestCenter {
             }
         }
     }
+
+    class ClaxxRequester {
+        companion object {
+            val url = "$apiDomain/claxx"
+            fun getClaxxs(page: Int, size: Int, context: Context, successCallback: (List<Claxx>) -> Unit, errorCallback: (VolleyError) -> Unit, major: Major? = null) {
+                if (major != null) {
+                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByMajor?page=$page&size=$size&major=${MajorRequester.url}/${major.id}",
+                            null,
+                            Response.Listener<JSONObject> { processClaxxsData(it, successCallback) },
+                            Response.ErrorListener { errorCallback(it) })
+                    Volley.newRequestQueue(context).add(request)
+                } else {
+                    val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                            null,
+                            Response.Listener<JSONObject> { processClaxxsData(it, successCallback) },
+                            Response.ErrorListener { errorCallback(it) })
+                    Volley.newRequestQueue(context).add(request)
+                }
+
+            }
+
+
+            fun getClaxxMajor(claxx: Claxx, context: Context, successCallback: (Major) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val request = JsonObjectRequest(Request.Method.GET, "$url/${claxx.id}/major", null,
+                        Response.Listener<JSONObject> { MajorRequester.processMajorData(it, successCallback) },
+                        Response.ErrorListener(errorCallback))
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            private fun processClaxxsData(claxxJSONObject: JSONObject, successCallback: (List<Claxx>) -> Unit) {
+                val embedded = claxxJSONObject.getJSONObject("_embedded")
+                val claxx: JSONArray = embedded.getJSONArray("claxx")
+                val result = ArrayList<Claxx>()
+                for (i in 0 until claxx.length()) {
+                    val name = claxx.getJSONObject(i).getString("name")
+                    val links = claxx.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Claxx(id, name, null))
+                }
+                successCallback(result)
+            }
+
+            fun getClaxx(context: Context, successCallBack: (Claxx) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
+
+                val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
+
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                        Response.Listener<JSONObject> { processClaxxData(it, successCallBack) },
+                        Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+
+            }
+
+            private fun processClaxxData(claxxJSONObject: JSONObject, successCallback: (Claxx) -> Unit) {
+                val name = claxxJSONObject.getString("name")
+                val links = claxxJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                successCallback(Claxx(id, name, null))
+            }
+
+            fun postClaxx(claxx: Claxx, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf(Pair("name", claxx.name), Pair("major", "${MajorRequester.url}/${claxx.major!!.id}"))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
+                        Response.Listener { successCallBack() },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun deleteClaxxs(claxxs: List<Claxx>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val requestQueue = Volley.newRequestQueue(context)
+                claxxs.forEachIndexed { index, claxx ->
+                    val id = claxx.id
+                    val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
+                            null,
+                            Response.Listener<JSONObject> { if (index == claxxs.lastIndex) successCallback() },
+                            Response.ErrorListener { errorCallback(it) })
+                    requestQueue.add(request)
+                }
+            }
+
+            fun patchClaxx(claxx: Claxx, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf(Pair("name", claxx.name), Pair("major", "${MajorRequester.url}/${claxx.major!!.id}"))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${claxx.id}", jsonObject,
+                        Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+        }
+    }
+
 }
 
 

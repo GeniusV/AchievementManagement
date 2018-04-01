@@ -28,7 +28,7 @@ package com.geniusver.achievementmanagement
 
 data class Student(val id: Long, val name: String) : Data()
 
-data class Claxx(val id: Long, val name: String) : Data()
+data class Claxx(val id: Long, val name: String, val major: Major?) : Data()
 
 data class Course(val id: Long, val name: String, val collage: Collage?) : Data()
 

@@ -157,4 +157,57 @@ class CourseDetailAdapter(context: Context, val course: Course) : DetailAdapter<
     }
 }
 
+class ClaxxDetailAdapter(context: Context, val claxx: Claxx) : DetailAdapter<Claxx>(context, claxx) {
+
+    lateinit var mmajor: Major
+
+    init {
+        ensureMajorName()
+    }
+
+    fun ensureMajorName() {
+        RequestCenter.ClaxxRequester.getClaxxMajor(claxx, context, ::onMajorNameReceived, ::errorHandle)
+    }
+
+    fun onMajorNameReceived(major: Major){
+        mmajor = major
+        entity = Claxx(entity.id, entity.name, major)
+        generateList()
+    }
+
+    override fun defaultItemViewClickListener(view: View): View.OnClickListener {
+        return View.OnClickListener {
+            if (view.findViewById<TextView>(R.id.detail_text).text.toString().startsWith("major") &&
+                    view.findViewById<ImageView>(R.id.detail_icon).visibility == View.VISIBLE) {
+                val intent = Intent(context, DetailActivity::class.java).apply {
+                    putExtra(IntentKey.TYPE, "major")
+                    putExtra(IntentKey.ITEM, mmajor)
+                }
+                context.startActivity(intent)
+            }
+        }
+    }
+
+    override fun refresh() {
+        ensureMajorName()
+        super.refresh()
+    }
+
+    override val id: Long
+        get() = claxx.id
+
+    override fun generateList() {
+        values = listOf(
+                DetailAdapter.DetailData("ID: " + entity.id, false),
+                DetailAdapter.DetailData("Name: " + entity.name, false),
+                DetailAdapter.DetailData("major: " + entity.major?.name, true)
+        )
+        notifyDataSetChanged()
+    }
+
+    override fun queryDetail(successCallback: (Claxx) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.ClaxxRequester.getClaxx(context, successCallback, errorCallback, id)
+    }
+}
+
 
