@@ -28,33 +28,39 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_collage_edit.*
+import kotlinx.android.synthetic.main.activity_major_edit.*
 import kotlinx.android.synthetic.main.edit_header.*
 
-class CollageEditActivity : AppCompatActivity() {
+
+class MajorEditActivity : AppCompatActivity() {
     lateinit var action: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_collage_edit)
+        setContentView(R.layout.activity_major_edit)
 
         setSupportActionBar(toolbar)
 
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "Collage"
+            title = "Major"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
 
+        val major = intent.getSerializableExtra(IntentKey.ITEM) as Major
+
         if (action == IntentValue.Action.UPDATE) {
-            val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-            supportActionBar?.title = "collage: ${collage.id}"
-            collage_name.setText(collage.name)
+            supportActionBar?.title = "Major: ${major.id}"
         }
 
+        if (major.collage != null) {
+            major_collage.setText((major.collage.id).toString())
+        }
+        major_name.setText(major.name)
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.edit_menu, menu)
@@ -66,27 +72,47 @@ class CollageEditActivity : AppCompatActivity() {
             android.R.id.home -> {
                 onBackPressed(); return true
             }
-            R.id.menu_ok -> {
-                if (action == IntentValue.Action.INSERT) {
-                    RequestCenter.CollageRequester.postCollage(Collage(0, collage_name.text.toString()), applicationContext,
-                            { setResult(Activity.RESULT_OK); finish() }, {
-                        AlertDialog.Builder(this).apply {
-                            setMessage("Name already exists!!")
-                            setPositiveButton("Ok", { _, _ -> Unit })
-                        }.create().show()
-                    })
-                } else {
-                    val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-                    RequestCenter.CollageRequester.patchCollage(Collage(collage.id, collage_name.text.toString()), applicationContext,
-                            { setResult(Activity.RESULT_OK); finish() }, {
-                        AlertDialog.Builder(this).apply {
-                            setMessage("Name already exists!!")
-                            setPositiveButton("Ok", { _, _ -> Unit })
-                        }.create().show()
-                    })
-                }
-            }
+            R.id.menu_ok -> checkCollage()
         }
         return super.onOptionsItemSelected(item)
     }
+
+    fun checkCollage() {
+        val collageId = major_collage.text.toString().trim().toLongOrNull()
+        if (collageId == null) {
+            AlertDialog.Builder(this).apply {
+                setMessage("collage ID is not valid.")
+                setPositiveButton("Ok", { _, _ -> Unit })
+            }.create().show()
+        }
+        RequestCenter.CollageRequester.getCollage(this, ::sendMajor, {
+            AlertDialog.Builder(this).apply {
+                setMessage("collage ID: $collageId is not exist.")
+                setPositiveButton("Ok", { _, _ -> Unit })
+            }.create().show()
+        }, id = collageId)
+    }
+
+
+    fun sendMajor(collage: Collage) {
+        if (action == IntentValue.Action.INSERT) {
+            RequestCenter.MajorRequester.postMajor(Major(0, major_name.text.toString(), collage), applicationContext,
+                    { setResult(Activity.RESULT_OK); finish() }, {
+                AlertDialog.Builder(this).apply {
+                    setMessage("Name already exists!!")
+                    setPositiveButton("Ok", { _, _ -> Unit })
+                }.create().show()
+            })
+        } else {
+            val major = intent.getSerializableExtra(IntentKey.ITEM) as Major
+            RequestCenter.MajorRequester.patchMajor(Major(major.id, major_name.text.toString(), collage), applicationContext,
+                    { setResult(Activity.RESULT_OK); finish() }, {
+                AlertDialog.Builder(this).apply {
+                    setMessage("Name already exists!!")
+                    setPositiveButton("Ok", { _, _ -> Unit })
+                }.create().show()
+            })
+        }
+    }
+
 }

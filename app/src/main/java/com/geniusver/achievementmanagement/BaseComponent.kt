@@ -22,15 +22,16 @@
 
 package com.geniusver.achievementmanagement
 
+import android.app.SearchManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
 import android.util.TypedValue
 import android.view.*
 import android.widget.ImageView
@@ -38,7 +39,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
 import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
-import kotlinx.android.synthetic.main.fragment_list.*
 import java.io.Serializable
 
 /**
@@ -56,9 +56,9 @@ class IntentKey {
     }
 }
 
-class IntentValue{
+class IntentValue {
 
-    class Action{
+    class Action {
         companion object {
             const val UPDATE = "update"
             const val INSERT = "insert"
@@ -103,29 +103,51 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater?.inflate(R.menu.options_menu, menu)
-        if(enableEdit) menu?.findItem(R.id.menu_edit)?.isVisible = true
+        inflater?.inflate(R.menu.search_menu, menu)
+        val searchManager = activity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu?.findItem(R.id.search)?.actionView as SearchView
+        val tabs = activity.findViewById<TabLayout>(R.id.tabs)
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.componentName))
+        searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+        tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                searchView.queryHint = "Search " + tabs.getTabAt(tabs.selectedTabPosition)?.text as String
+            }
+
+        })
+
+        if (enableEdit) menu.findItem(R.id.menu_edit)?.isVisible = true
         mAdapter.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener {
             override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
-                menu?.findItem(R.id.menu_trash)?.isVisible = false
-                menu?.findItem(R.id.menu_add)?.isVisible = true
-                menu?.findItem(R.id.search)?.isVisible = true
+                menu.findItem(R.id.menu_trash)?.isVisible = false
+                menu.findItem(R.id.menu_add)?.isVisible = true
+                menu.findItem(R.id.search)?.isVisible = true
+                menu.findItem(R.id.menu_edit)?.isVisible = true
             }
 
             override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
             }
 
             override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
-                menu?.findItem(R.id.menu_trash)?.isVisible = true
-                menu?.findItem(R.id.menu_add)?.isVisible = false
-                menu?.findItem(R.id.search)?.isVisible = false
+                menu.findItem(R.id.menu_trash)?.isVisible = true
+                menu.findItem(R.id.menu_add)?.isVisible = false
+                menu.findItem(R.id.menu_edit)?.isVisible = false
+                menu.findItem(R.id.search)?.isVisible = false
 
             }
 
             override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
                 if (itemSelectedCount == 0) {
-                    menu?.findItem(R.id.menu_trash)?.isVisible = false
-                    menu?.findItem(R.id.menu_add)?.isVisible = true
-                    menu?.findItem(R.id.search)?.isVisible = true
+                    menu.findItem(R.id.menu_trash)?.isVisible = false
+                    menu.findItem(R.id.menu_add)?.isVisible = true
+                    menu.findItem(R.id.menu_edit)?.isVisible = true
+                    menu.findItem(R.id.search)?.isVisible = true
                 }
             }
 
@@ -133,7 +155,7 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId) {
+        when (item?.itemId) {
             R.id.menu_trash -> mAdapter.deleteSelectedData()
         }
         return super.onOptionsItemSelected(item)
@@ -158,7 +180,6 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     init {
         context.theme.resolveAttribute(R.attr.selectableItemBackground, typedValue, true)
         background = typedValue.resourceId
-        refresh()
     }
 
 
@@ -201,12 +222,12 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 
-    protected fun deleteSuccessHandle(){
+    protected fun deleteSuccessHandle() {
         Toast.makeText(context, "Delete Success!!", Toast.LENGTH_SHORT).show()
         refresh()
     }
 
-    fun deleteSelectedData(){
+    fun deleteSelectedData() {
         val selectedData = selectedItemList.map {
             values[it]
         }
@@ -255,7 +276,12 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): DetailViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.detail_list, parent, false)
         view.setBackgroundResource(background)
+        view.setOnClickListener(defaultItemViewClickListener(view))
         return DetailViewHolder(view)
+    }
+
+    protected open fun defaultItemViewClickListener(view: View): View.OnClickListener {
+        return View.OnClickListener { }
     }
 
 
@@ -272,7 +298,7 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 
-    fun refresh() {
+    open fun refresh() {
         queryDetail()
     }
 
@@ -290,6 +316,9 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
 
     }
 
+    override fun getItemCount(): Int {
+        return values.size
+    }
 
     data class DetailData(val string: String, val isGoEnable: Boolean)
 
@@ -297,14 +326,6 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
 
 interface Identifiable {
     val identifier: Int
-}
-
-fun <T> appendOnClick(activity: T, type: String) where T : AppCompatActivity, T : Identifiable {
-    var intent = Intent()
-    when (type) {
-        "collage" -> intent = Intent(activity, CollageEditActivity::class.java).apply { putExtra(IntentKey.ACTION, IntentValue.Action.INSERT) }
-    }
-    activity.startActivityForResult(intent, activity.identifier)
 }
 
 

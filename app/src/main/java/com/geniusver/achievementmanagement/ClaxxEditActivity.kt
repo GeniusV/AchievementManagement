@@ -24,37 +24,43 @@ package com.geniusver.achievementmanagement
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_collage_edit.*
+import kotlinx.android.synthetic.main.activity_claxx_edit.*
 import kotlinx.android.synthetic.main.edit_header.*
 
-class CollageEditActivity : AppCompatActivity() {
+
+class ClaxxEditActivity : AppCompatActivity() {
     lateinit var action: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_collage_edit)
+        setContentView(R.layout.activity_claxx_edit)
 
         setSupportActionBar(toolbar)
 
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "Collage"
+            title = "Claxx"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
 
+        val claxx = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
+
         if (action == IntentValue.Action.UPDATE) {
-            val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-            supportActionBar?.title = "collage: ${collage.id}"
-            collage_name.setText(collage.name)
+            supportActionBar?.title = "Claxx: ${claxx.id}"
         }
 
+        if (claxx.major != null) {
+            claxx_major.setText((claxx.major.id).toString())
+        }
+        claxx_name.setText(claxx.name)
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.edit_menu, menu)
@@ -66,27 +72,47 @@ class CollageEditActivity : AppCompatActivity() {
             android.R.id.home -> {
                 onBackPressed(); return true
             }
-            R.id.menu_ok -> {
-                if (action == IntentValue.Action.INSERT) {
-                    RequestCenter.CollageRequester.postCollage(Collage(0, collage_name.text.toString()), applicationContext,
-                            { setResult(Activity.RESULT_OK); finish() }, {
-                        AlertDialog.Builder(this).apply {
-                            setMessage("Name already exists!!")
-                            setPositiveButton("Ok", { _, _ -> Unit })
-                        }.create().show()
-                    })
-                } else {
-                    val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-                    RequestCenter.CollageRequester.patchCollage(Collage(collage.id, collage_name.text.toString()), applicationContext,
-                            { setResult(Activity.RESULT_OK); finish() }, {
-                        AlertDialog.Builder(this).apply {
-                            setMessage("Name already exists!!")
-                            setPositiveButton("Ok", { _, _ -> Unit })
-                        }.create().show()
-                    })
-                }
-            }
+            R.id.menu_ok -> checkMajor()
         }
         return super.onOptionsItemSelected(item)
     }
+
+    fun checkMajor() {
+        val majorId = claxx_major.text.toString().trim().toLongOrNull()
+        if (majorId == null) {
+            AlertDialog.Builder(this).apply {
+                setMessage("major ID is not valid.")
+                setPositiveButton("Ok", { _, _ -> Unit })
+            }.create().show()
+        }
+        RequestCenter.MajorRequester.getMajor(this, ::sendClaxx, {
+            AlertDialog.Builder(this).apply {
+                setMessage("major ID: $majorId is not exist.")
+                setPositiveButton("Ok", { _, _ -> Unit })
+            }.create().show()
+        }, id = majorId)
+    }
+
+
+    fun sendClaxx(major: Major) {
+        if (action == IntentValue.Action.INSERT) {
+            RequestCenter.ClaxxRequester.postClaxx(Claxx(0, claxx_name.text.toString(), major), applicationContext,
+                    { setResult(Activity.RESULT_OK); finish() }, {
+                AlertDialog.Builder(this).apply {
+                    setMessage("Name already exists!!")
+                    setPositiveButton("Ok", { _, _ -> Unit })
+                }.create().show()
+            })
+        } else {
+            val claxx = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
+            RequestCenter.ClaxxRequester.patchClaxx(Claxx(claxx.id, claxx_name.text.toString(), major), applicationContext,
+                    { setResult(Activity.RESULT_OK); finish() }, {
+                AlertDialog.Builder(this).apply {
+                    setMessage("Name already exists!!")
+                    setPositiveButton("Ok", { _, _ -> Unit })
+                }.create().show()
+            })
+        }
+    }
+
 }

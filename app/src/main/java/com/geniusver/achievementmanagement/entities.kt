@@ -26,16 +26,53 @@ package com.geniusver.achievementmanagement
  * Created by GeniusV on 3/24/18.
  */
 
-data class Student(val id: Long, val name: String) : Data()
+data class Student(val id: Long, val name: String, val claxx: Claxx?) : Data()
 
-data class Claxx(val id: Long, val name: String) : Data()
+data class Claxx(val id: Long, val name: String, val major: Major?) : Data()
 
-data class Course(val id: Long, val name: String) : Data()
+data class Course(val id: Long, val name: String, val collage: Collage?) : Data()
 
-data class Major(val id: Long, val name: String) : Data()
+data class Major(val id: Long, val name: String, val collage: Collage?) : Data()
 
-data class Score(val id: Long, val studentName: String, val courseName: String, val term: String) : Data()
+class Score(val id: Long, var value: Int ) : Data() {
+    constructor(id: Long, value: Int, student: Student, course: Course, term: Term) : this(id, value)
+
+    var student: Student? = null
+
+
+    var course: Course? = null
+
+
+    var term: Term? = null
+
+    companion object {
+        const val FULL = "full"
+        const val STUDENT = "student"
+        const val COURSE = "course"
+        const val TERM = "term"
+    }
+
+
+    fun getFullName(): String {
+        val fieldList = ArrayList<String>()
+        if (student != null) fieldList.add(student!!.name)
+        if (course != null) fieldList.add(course!!.name)
+        if (term != null) fieldList.add(term!!.value)
+        return fieldList.joinToString(" - ")
+    }
+
+    fun getName(mode: String = FULL, displayValue: Boolean = false): String {
+        var displayString = ""
+        when (mode) {
+            STUDENT -> if (student != null) displayString = student!!.name else ""
+            COURSE -> if (course != null) displayString =  course!!.name else ""
+            TERM -> if(term != null) displayString = term!!.value else ""
+            else -> displayString = getFullName()
+        }
+        return if(displayValue) "$displayString - $value" else displayString
+    }
+}
 
 data class Term(val id: Long, val value: String) : Data()
 
-data class Collage(val id:Long, val name: String): Data()
+data class Collage(val id: Long, val name: String) : Data()

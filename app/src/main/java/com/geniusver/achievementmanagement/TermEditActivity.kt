@@ -24,34 +24,34 @@ package com.geniusver.achievementmanagement
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_collage_edit.*
 import kotlinx.android.synthetic.main.edit_header.*
+import kotlinx.android.synthetic.main.activity_term_edit.*
 
-class CollageEditActivity : AppCompatActivity() {
+class TermEditActivity : AppCompatActivity() {
     lateinit var action: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_collage_edit)
+        setContentView(R.layout.activity_term_edit)
 
         setSupportActionBar(toolbar)
 
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "Collage"
+            title = "term"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
 
         if (action == IntentValue.Action.UPDATE) {
-            val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-            supportActionBar?.title = "collage: ${collage.id}"
-            collage_name.setText(collage.name)
+            val term = intent.getSerializableExtra(IntentKey.ITEM) as Term
+            supportActionBar?.title = "term: ${term.id}"
+            term_value.setText(term.value)
         }
 
     }
@@ -68,7 +68,7 @@ class CollageEditActivity : AppCompatActivity() {
             }
             R.id.menu_ok -> {
                 if (action == IntentValue.Action.INSERT) {
-                    RequestCenter.CollageRequester.postCollage(Collage(0, collage_name.text.toString()), applicationContext,
+                    RequestCenter.TermRequester.postTerm(Term(0, term_value.text.toString()), applicationContext,
                             { setResult(Activity.RESULT_OK); finish() }, {
                         AlertDialog.Builder(this).apply {
                             setMessage("Name already exists!!")
@@ -76,8 +76,8 @@ class CollageEditActivity : AppCompatActivity() {
                         }.create().show()
                     })
                 } else {
-                    val collage = intent.getSerializableExtra(IntentKey.ITEM) as Collage
-                    RequestCenter.CollageRequester.patchCollage(Collage(collage.id, collage_name.text.toString()), applicationContext,
+                    val term = intent.getSerializableExtra(IntentKey.ITEM) as Term
+                    RequestCenter.TermRequester.patchTerm(Term(term.id, term_value.text.toString()), applicationContext,
                             { setResult(Activity.RESULT_OK); finish() }, {
                         AlertDialog.Builder(this).apply {
                             setMessage("Name already exists!!")
@@ -89,4 +89,6 @@ class CollageEditActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+
 }

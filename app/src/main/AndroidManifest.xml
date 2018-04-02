@@ -25,7 +25,6 @@
         </activity>
         <activity
                 android:name=".DetailActivity"
-                android:launchMode="singleTop"
                 android:parentActivityName=".MainActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -38,9 +37,19 @@
                 <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
         </activity>
-        <activity android:name=".EditActivity">
-        </activity>
         <activity android:name=".CollageEditActivity">
+        </activity>
+        <activity android:name=".MajorEditActivity">
+        </activity>
+        <activity android:name=".CourseEditActivity">
+        </activity>
+        <activity android:name=".ClaxxEditActivity">
+        </activity>
+        <activity android:name=".StudentEditActivity">
+        </activity>
+        <activity android:name=".TermEditActivity">
+        </activity>
+        <activity android:name=".ScoreEditActivity">
         </activity>
     </application>
 
