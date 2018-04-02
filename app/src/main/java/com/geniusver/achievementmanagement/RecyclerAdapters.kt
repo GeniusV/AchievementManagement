@@ -362,7 +362,7 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
         var mScore = values[position] as Score
         holder?.apply {
             score = mScore
-            textView.text = mScore.getName(displayMode)
+            textView.text = mScore.getName(displayMode, final)
             imageView.setImageResource(R.drawable.ic_score)
         }
         super.onBindViewHolder(holder, position)

@@ -192,18 +192,30 @@ class DetailActivity : AppCompatActivity(), Identifiable {
             "score" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Score
                 val categoryList = ArrayList<String>()
+                var displayMode = ""
                 val isStudentChosed = intent.getBooleanExtra("student", false)
                 val isCourseChosed = intent.getBooleanExtra("course", false)
                 val isTermChosed = intent.getBooleanExtra("term", false)
-                if (isStudentChosed) categoryList.add(item.student?.name!!)
-                if (isCourseChosed) categoryList.add(item.course?.name!!)
-                if (isTermChosed) categoryList.add(item.term?.value!!)
+                if (isStudentChosed) categoryList.add(item.student?.name!!) else {displayMode = Score.STUDENT; item.student = null}
+                if (isCourseChosed) categoryList.add(item.course?.name!!) else {displayMode = Score.COURSE; item.course = null}
+                if (isTermChosed) categoryList.add(item.term?.value!!) else {displayMode = Score.TERM; item.term = null}
 
                 collapsing_toolbar.title = categoryList.joinToString(" - ")
                 detail.layoutManager = LinearLayoutManager(this)
+
+
                 detail.adapter = ScoreDetailAdapter(this, item, isStudentChosed, isCourseChosed, isTermChosed).apply {
                     refreshList.add(this::refresh)
                     entityMap["score"] = this::entity
+                    viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
+                        addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
+                            mAdapter = ScoreRecyclerAdapter(applicationContext, student = item.student, course = item.course, term = item.term, displayMode = displayMode, final = true).apply {
+                                setMultiChoiceToolbar(newMultiChoiceToolbar())
+                            }
+                            refreshList.add(this::refresh)
+                        }, "Course")
+                    }
+
                 }
             }
         }
