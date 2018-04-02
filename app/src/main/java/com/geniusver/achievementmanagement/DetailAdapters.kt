@@ -28,6 +28,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.volley.VolleyError
+import org.w3c.dom.EntityReference
 
 /**
  * Created by GeniusV on 3/28/18.
@@ -264,8 +265,47 @@ class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapt
 }
 
 
-class MiddleScoreDetailAdapter(context: Context, val student: Student? = null, val course: Course? = null, val term: Term?){
+class ScoreDetailAdapter(context: Context, val score: Score, val isStudentChosed: Boolean = false, val isCourseChosed: Boolean = false, val isTermChosed: Boolean = false ): DetailAdapter<Score>(context, score){
 
+    init {
+        generateList()
+    }
+
+    override val id: Long
+        get() = score.id
+
+    override fun queryDetail(successCallback: (Score) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        successCallback(score)
+    }
+
+    override fun defaultItemViewClickListener(view: View): View.OnClickListener {
+        return View.OnClickListener {
+            val clickedString = view.findViewById<TextView>(R.id.detail_text).text.toString()
+            var intent = Intent()
+            if (clickedString.startsWith("Student")) intent = Intent(context, DetailActivity::class.java).apply {
+                putExtra(IntentKey.TYPE, "student")
+                putExtra(IntentKey.ITEM, entity.student)
+            }
+            if (clickedString.startsWith("Course")) intent = Intent(context, DetailActivity::class.java).apply {
+                putExtra(IntentKey.TYPE, "course")
+                putExtra(IntentKey.ITEM, entity.course)
+            }
+            if (clickedString.startsWith("Term")) intent = Intent(context, DetailActivity::class.java).apply {
+                putExtra(IntentKey.TYPE, "term")
+                putExtra(IntentKey.ITEM, entity.term)
+            }
+            context.startActivity(intent)
+        }
+    }
+
+    override fun generateList() {
+        var tempValues = ArrayList<DetailData>()
+        if(entity.student != null && isStudentChosed) tempValues.add(DetailData("Student: " + entity.student!!.name, true))
+        if(entity.course != null && isCourseChosed) tempValues.add(DetailData("Course: " + entity.course!!.name, true))
+        if(entity.term != null && isTermChosed) tempValues.add(DetailData("Term: " + entity.term!!.value, true))
+        values = tempValues
+        notifyDataSetChanged()
+    }
 }
 
 

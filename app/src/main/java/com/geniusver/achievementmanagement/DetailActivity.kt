@@ -157,7 +157,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.layoutManager = LinearLayoutManager(this)
                 detail.adapter = ClaxxDetailAdapter(this, item).apply {
                     refreshList.add(this::refresh)
-                    entityMap["claxx"] == this::entity
+                    entityMap["claxx"] = this::entity
                 }
                 viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
                     addFragment(ContentFragment<StudentRecyclerAdapter.StudentViewHolder, Student>().apply {
@@ -187,6 +187,23 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         refreshList.add(this::refresh)
                         enableEdit = true
                     }, "Course")
+                }
+            }
+            "score" -> {
+                val item = intent.getSerializableExtra(IntentKey.ITEM) as Score
+                val categoryList = ArrayList<String>()
+                val isStudentChosed = intent.getBooleanExtra("student", false)
+                val isCourseChosed = intent.getBooleanExtra("course", false)
+                val isTermChosed = intent.getBooleanExtra("term", false)
+                if (isStudentChosed) categoryList.add(item.student?.name!!)
+                if (isCourseChosed) categoryList.add(item.course?.name!!)
+                if (isTermChosed) categoryList.add(item.term?.value!!)
+
+                collapsing_toolbar.title = categoryList.joinToString(" - ")
+                detail.layoutManager = LinearLayoutManager(this)
+                detail.adapter = ScoreDetailAdapter(this, item, isStudentChosed, isCourseChosed, isTermChosed).apply {
+                    refreshList.add(this::refresh)
+                    entityMap["score"] = this::entity
                 }
             }
         }

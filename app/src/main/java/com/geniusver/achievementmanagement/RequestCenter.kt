@@ -29,6 +29,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.geniusver.achievementmanagement.RequestCenter.CollageRequester.Companion.processCollageData
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -612,19 +613,19 @@ class RequestCenter {
                 successCallback(result)
             }
 
-            fun getScoreCascade(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, context: Context){
+            fun getScoreCascade(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, context: Context) {
                 val queue = Volley.newRequestQueue(context)
                 getScoreStudent(score, position, successCallback, errorCallback, queue)
             }
 
-            fun getScoreStudent(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+            fun getScoreStudent(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue) {
                 val request = JsonObjectRequest(Request.Method.GET, "$url/${score.id}/student", null,
-                        Response.Listener<JSONObject> { processScoreStudentAndForwardToCourse(it,score, position, successCallback, errorCallback, queue) },
+                        Response.Listener<JSONObject> { processScoreStudentAndForwardToCourse(it, score, position, successCallback, errorCallback, queue) },
                         Response.ErrorListener(errorCallback))
                 queue.add(request)
             }
 
-            fun processScoreStudentAndForwardToCourse(studentJSONObject: JSONObject, score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+            fun processScoreStudentAndForwardToCourse(studentJSONObject: JSONObject, score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue) {
                 val name = studentJSONObject.getString("name")
                 val links = studentJSONObject.getJSONObject("_links")
                 val self = links.getJSONObject("self")
@@ -634,14 +635,15 @@ class RequestCenter {
                 getScoreCourse(score, position, successCallback, errorCallback, queue)
             }
 
-            fun getScoreCourse(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+
+            fun getScoreCourse(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue) {
                 val request = JsonObjectRequest(Request.Method.GET, "$url/${score.id}/course", null,
-                        Response.Listener<JSONObject> { processScoreCourseAndForwardToTerm(it,score, position, successCallback, errorCallback, queue) },
+                        Response.Listener<JSONObject> { processScoreCourseAndForwardToTerm(it, score, position, successCallback, errorCallback, queue) },
                         Response.ErrorListener(errorCallback))
                 queue.add(request)
             }
 
-            fun processScoreCourseAndForwardToTerm(courseJSONObject: JSONObject, score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+            fun processScoreCourseAndForwardToTerm(courseJSONObject: JSONObject, score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue) {
                 val name = courseJSONObject.getString("name")
                 val links = courseJSONObject.getJSONObject("_links")
                 val self = links.getJSONObject("self")
@@ -651,9 +653,9 @@ class RequestCenter {
                 getScoreTerm(score, position, successCallback, errorCallback, queue)
             }
 
-            fun getScoreTerm(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+            fun getScoreTerm(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue) {
                 val request = JsonObjectRequest(Request.Method.GET, "$url/${score.id}/term", null,
-                        Response.Listener<JSONObject> { processScoreTermAndReturn(it,score, position, successCallback, errorCallback, queue) },
+                        Response.Listener<JSONObject> { processScoreTermAndReturn(it, score, position, successCallback, errorCallback, queue) },
                         Response.ErrorListener(errorCallback))
                 queue.add(request)
 
@@ -669,13 +671,21 @@ class RequestCenter {
                 successCallback(score, position)
             }
 
-            fun processScoreData(scoreJSONObject: JSONObject, successCallback: (Score) -> Unit) {
-                val value = scoreJSONObject.getString("value")
+            fun getScore(context: Context, id: Long?, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val request = JsonObjectRequest(Request.Method.GET, "$url/$id",null,
+                Response.Listener<JSONObject> { processScoreData(it, successCallback, errorCallback, context) },
+                Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun processScoreData(scoreJSONObject: JSONObject, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, context: Context) {
+                val value = scoreJSONObject.getString("value").toInt()
                 val links = scoreJSONObject.getJSONObject("_links")
                 val self = links.getJSONObject("self")
                 val href = self.getString("href")
                 val id = href.split("/").last().toLong()
-                successCallback(Score(id, value.toInt()))
+                getScoreCascade(Score(id, value), 0, successCallback, errorCallback,context)
             }
 
             fun postScore(score: Score, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
@@ -708,8 +718,6 @@ class RequestCenter {
             }
         }
     }
-
-
 
 
 }

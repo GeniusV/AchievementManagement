@@ -370,16 +370,24 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
 
     override fun defaultItemViewClickListener(holder: ScoreViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
+            val context = holder?.view?.context
             if (final) {
-                val context = holder?.view?.context
-                val intent = Intent(context, ScoreEditActivity::class.java)
-                intent.putExtra(IntentKey.ITEM, holder?.score)
-                intent.putExtra(IntentKey.TYPE, "score")
-                intent.putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                val intent = Intent(context, ScoreEditActivity::class.java).apply {
+                    putExtra(IntentKey.ITEM, holder?.score)
+                    putExtra(IntentKey.TYPE, "score")
+                    putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                }
                 context?.startActivity(intent)
             }
             else{
-
+                val intent = Intent(context, DetailActivity::class.java).apply {
+                    putExtra("student", student != null || displayMode == Score.STUDENT)
+                    putExtra("course",  course != null || displayMode == Score.COURSE)
+                    putExtra("term", term != null || displayMode == Score.TERM)
+                    putExtra(IntentKey.ITEM, holder?.score)
+                    putExtra(IntentKey.TYPE, "score")
+                }
+                context?.startActivity(intent)
             }
         }
     }
