@@ -307,9 +307,22 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 }
             }
             R.id.menu_add -> {
-                val type = getTabString()
+                var type = getTabString()
                 var addIntent = Intent()
-                when (type) {
+                if (intent.getStringExtra(IntentKey.TYPE) == "score") type = "score"
+                if (intent.getStringExtra(IntentKey.TYPE) == "student") {
+                    type = "score"
+                }
+                if (intent.getStringExtra(IntentKey.TYPE) == "course") {
+                    type = "score"
+                }
+                 when (type) {
+                    "score" -> addIntent = Intent(this, ScoreEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, intent.getSerializableExtra(IntentKey.ITEM))
+                        if (intent.getStringExtra(IntentKey.TYPE) == "student") putExtra(IntentKey.ITEM, Score(0, 0).apply { student = intent.getSerializableExtra(IntentKey.ITEM) as Student })
+                        if (intent.getStringExtra(IntentKey.TYPE) == "course") putExtra(IntentKey.ITEM, Score(0, 0).apply { course = intent.getSerializableExtra(IntentKey.ITEM) as Course })
+                    }
                     "collage" -> addIntent = Intent(this, CollageEditActivity::class.java).apply {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                     }
