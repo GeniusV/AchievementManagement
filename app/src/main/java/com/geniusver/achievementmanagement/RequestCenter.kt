@@ -528,7 +528,7 @@ class RequestCenter {
             }
 
             fun getTerm(context: Context, successCallBack: (Term) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, value: String = "") {
-                val requestUrl = if (value == "") "$url/$id" else "$url/search/findByName?value=$value"
+                val requestUrl = if (value == "") "$url/$id" else "$url/search/findByValue?value=$value"
                 val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processTermData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }

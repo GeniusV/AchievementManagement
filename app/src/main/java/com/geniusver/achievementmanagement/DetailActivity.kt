@@ -82,7 +82,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                                 intent.putExtra(IntentKey.ITEM, term)
                                 intent.putExtra(IntentKey.TYPE, "term")
                                 intent.putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
-                                startActivity(intent)
+                                startActivityForResult(intent, identifier)
                             }, ::showError,
                             id = query.toLongOrNull(), value = if (query.toLongOrNull() == null) query else "")
             }
