@@ -24,7 +24,6 @@ package com.geniusver.achievementmanagement
 
 import android.app.Activity
 import android.app.SearchManager
-import android.content.Entity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -149,7 +148,22 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     refreshList.add(this::refresh)
                     entityMap["course"] = this::entity
                 }
-                //todo
+                viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
+                    addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
+                        mAdapter = ScoreRecyclerAdapter(applicationContext, course = item, displayMode = Score.STUDENT).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                        enableEdit = true
+                    }, "Student")
+                    addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
+                        mAdapter = ScoreRecyclerAdapter(applicationContext, course = item, displayMode = Score.TERM).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                        enableEdit = true
+                    }, "Term")
+                }
             }
             "claxx" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Claxx
@@ -187,18 +201,38 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         refreshList.add(this::refresh)
                         enableEdit = true
                     }, "Course")
+                    addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
+                        mAdapter = ScoreRecyclerAdapter(applicationContext, student = item, displayMode = Score.TERM).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                        enableEdit = true
+                    }, "Term")
                 }
             }
             "score" -> {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Score
                 val categoryList = ArrayList<String>()
                 var displayMode = ""
+                var tabString = ""
                 val isStudentChosed = intent.getBooleanExtra("student", false)
                 val isCourseChosed = intent.getBooleanExtra("course", false)
                 val isTermChosed = intent.getBooleanExtra("term", false)
-                if (isStudentChosed) categoryList.add(item.student?.name!!) else {displayMode = Score.STUDENT; item.student = null}
-                if (isCourseChosed) categoryList.add(item.course?.name!!) else {displayMode = Score.COURSE; item.course = null}
-                if (isTermChosed) categoryList.add(item.term?.value!!) else {displayMode = Score.TERM; item.term = null}
+                if (isStudentChosed) categoryList.add(item.student?.name!!) else {
+                    displayMode = Score.STUDENT
+                    item.student = null
+                    tabString = "Student"
+                }
+                if (isCourseChosed) categoryList.add(item.course?.name!!) else {
+                    displayMode = Score.COURSE
+                    item.course = null
+                    tabString = "Course"
+                }
+                if (isTermChosed) categoryList.add(item.term?.value!!) else {
+                    displayMode = Score.TERM
+                    item.term = null
+                    tabString = "Term"
+                }
 
                 collapsing_toolbar.title = categoryList.joinToString(" - ")
                 detail.layoutManager = LinearLayoutManager(this)
@@ -213,7 +247,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                                 setMultiChoiceToolbar(newMultiChoiceToolbar())
                             }
                             refreshList.add(this::refresh)
-                        }, "Course")
+                        }, tabString)
                     }
 
                 }
