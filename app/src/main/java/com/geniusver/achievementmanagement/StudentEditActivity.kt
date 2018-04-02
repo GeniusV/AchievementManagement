@@ -83,6 +83,7 @@ class StudentEditActivity : AppCompatActivity() {
                 setMessage("claxx ID is not valid.")
                 setPositiveButton("Ok", { _, _ -> Unit })
             }.create().show()
+            return
         }
         RequestCenter.ClaxxRequester.getClaxx(this, ::sendStudent, {
             AlertDialog.Builder(this).apply {

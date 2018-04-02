@@ -368,9 +368,10 @@ class ScoreRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<ScoreRecy
     override fun defaultItemViewClickListener(holder: ScoreViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
             val context = holder?.view?.context
-            val intent = Intent(context, DetailActivity::class.java)
+            val intent = Intent(context, ScoreEditActivity::class.java)
             intent.putExtra(IntentKey.ITEM, holder?.score)
             intent.putExtra(IntentKey.TYPE, "score")
+            intent.putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
             context?.startActivity(intent)
         }
     }

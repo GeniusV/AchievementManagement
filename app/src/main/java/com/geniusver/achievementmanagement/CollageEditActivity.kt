@@ -43,7 +43,7 @@ class CollageEditActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "collage"
+            title = "Collage"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
@@ -89,6 +89,4 @@ class CollageEditActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-
 }

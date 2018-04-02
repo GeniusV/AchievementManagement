@@ -22,8 +22,6 @@
 
 package com.geniusver.achievementmanagement
 
-import com.geniusver.achievementmanagement.R.id.name
-
 /**
  * Created by GeniusV on 3/24/18.
  */
@@ -36,12 +34,14 @@ data class Course(val id: Long, val name: String, val collage: Collage?) : Data(
 
 data class Major(val id: Long, val name: String, val collage: Collage?) : Data()
 
-class Score(val id: Long, val value : Int, var name: String = "") : Data(){
+class Score(val id: Long, var value: Int, var name: String = "") : Data() {
+    constructor(id: Long, value: Int, student: Student, course: Course, term: Term) : this(id, value)
+
     var student: Student? = null
-    set(value) {
-        field = value
-        generateName()
-    }
+        set(value) {
+            field = value
+            generateName()
+        }
 
     var course: Course? = null
         set(value) {
@@ -55,12 +55,11 @@ class Score(val id: Long, val value : Int, var name: String = "") : Data(){
             generateName()
         }
 
-    fun generateName()
-    {
+    fun generateName() {
         val fieldList = ArrayList<String>()
-        if(student != null) fieldList.add(student!!.name)
-        if(course != null) fieldList.add(course!!.name)
-        if(term != null) fieldList.add(term!!.value)
+        if (student != null) fieldList.add(student!!.name)
+        if (course != null) fieldList.add(course!!.name)
+        if (term != null) fieldList.add(term!!.value)
         fieldList.add(value.toString())
         name = fieldList.joinToString(" - ")
     }
@@ -68,4 +67,4 @@ class Score(val id: Long, val value : Int, var name: String = "") : Data(){
 
 data class Term(val id: Long, val value: String) : Data()
 
-data class Collage(val id:Long, val name: String): Data()
+data class Collage(val id: Long, val name: String) : Data()

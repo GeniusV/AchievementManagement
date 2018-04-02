@@ -131,7 +131,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                     "term" -> addIntent = Intent(this, TermEditActivity::class.java).apply {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
                     }
-
+                    "score" -> addIntent = Intent(this, ScoreEditActivity::class.java).apply {
+                        putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
+                        putExtra(IntentKey.ITEM, Score(0, 0, ""))
+                    }
                 }
                 startActivityForResult(addIntent, identifier)
             }
