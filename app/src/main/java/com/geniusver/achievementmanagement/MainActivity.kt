@@ -73,7 +73,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 mAdapter = com.geniusver.achievementmanagement.TermRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Term")
-
+            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.ScoreRecyclerAdapter.ScoreViewHolder, com.geniusver.achievementmanagement.Score>().apply {
+                mAdapter = com.geniusver.achievementmanagement.ScoreRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
+                refreshList.add(this::refresh)
+            }, "Score")
         }
 
 

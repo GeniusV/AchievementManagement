@@ -27,6 +27,7 @@ import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.VolleyError
@@ -323,5 +324,64 @@ class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecycl
         var textView = view.findViewById<TextView>(R.id.name)
     }
 }
+
+class ScoreRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
+
+    init {
+        refresh()
+    }
+
+    override fun performDelete(data: List<Score>) {
+        RequestCenter.ScoreRequester.deleteScores(data, context, ::deleteSuccessHandle, ::errorHandle)
+    }
+
+    override fun queryData(page: Int, size: Int, successCallback: (List<Score>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.ScoreRequester.getScores(page, size, context, ::queryCascadeData, ::errorHandle)
+    }
+
+    fun queryCascadeData(scoreList: List<Score>){
+        scoreList.forEachIndexed{
+            index, score -> RequestCenter.ScoreRequester.getScoreCascade(score, index, ::updateScoreCascade, ::errorHandle, context)
+        }
+        add(scoreList)
+    }
+
+    fun updateScoreCascade(score: Score, position: Int){
+        values[position] = score
+        notifyItemChanged(position)
+    }
+
+    override fun newViewHolder(view: View): ScoreViewHolder {
+        return ScoreViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ScoreViewHolder?, position: Int) {
+        var mScore = values[position] as Score
+        holder?.apply {
+            score = mScore
+            textView.text = mScore.name
+            imageView.setImageResource(R.drawable.ic_score)
+        }
+        super.onBindViewHolder(holder, position)
+    }
+
+    override fun defaultItemViewClickListener(holder: ScoreViewHolder?, position: Int): View.OnClickListener {
+        return View.OnClickListener {
+            val context = holder?.view?.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra(IntentKey.ITEM, holder?.score)
+            intent.putExtra(IntentKey.TYPE, "score")
+            context?.startActivity(intent)
+        }
+    }
+
+    class ScoreViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val view = view
+        var score: Score? = null
+        var imageView = view.findViewById<ImageView>(R.id.avater)
+        var textView = view.findViewById<TextView>(R.id.name)
+    }
+}
+
 
 

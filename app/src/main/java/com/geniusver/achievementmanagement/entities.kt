@@ -22,6 +22,8 @@
 
 package com.geniusver.achievementmanagement
 
+import com.geniusver.achievementmanagement.R.id.name
+
 /**
  * Created by GeniusV on 3/24/18.
  */
@@ -34,15 +36,24 @@ data class Course(val id: Long, val name: String, val collage: Collage?) : Data(
 
 data class Major(val id: Long, val name: String, val collage: Collage?) : Data()
 
-class Score(val id: Long, var name: String = "",  val value : Int) : Data(){
+class Score(val id: Long, val value : Int, var name: String = "") : Data(){
     var student: Student? = null
-    set(value) = generateName()
+    set(value) {
+        field = value
+        generateName()
+    }
 
     var course: Course? = null
-    set(value) = generateName()
+        set(value) {
+            field = value
+            generateName()
+        }
 
     var term: Term? = null
-    set(value) = generateName()
+        set(value) {
+            field = value
+            generateName()
+        }
 
     fun generateName()
     {

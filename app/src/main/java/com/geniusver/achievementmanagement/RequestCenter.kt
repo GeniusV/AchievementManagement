@@ -24,6 +24,7 @@ package com.geniusver.achievementmanagement
 
 import android.content.Context
 import com.android.volley.Request
+import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
@@ -38,7 +39,7 @@ import org.json.JSONObject
 class RequestCenter {
 
     companion object {
-        val apiDomain = "http://192.168.1.109:8080"
+        val apiDomain = "http://192.168.43.224:8080"
     }
 
     class CollageRequester {
@@ -573,6 +574,131 @@ class RequestCenter {
             }
         }
     }
+
+
+    class ScoreRequester {
+        companion object {
+            val url = "$apiDomain/score"
+            fun getScores(page: Int, size: Int, context: Context, successCallback: (List<Score>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                        null,
+                        Response.Listener<JSONObject> { processScoresData(it, successCallback) },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            private fun processScoresData(scoreJSONObject: JSONObject, successCallback: (List<Score>) -> Unit) {
+                val embedded = scoreJSONObject.getJSONObject("_embedded")
+                val score: JSONArray = embedded.getJSONArray("score")
+                val result = ArrayList<Score>()
+                for (i in 0 until score.length()) {
+                    val value = score.getJSONObject(i).getString("value")
+                    val links = score.getJSONObject(i).getJSONObject("_links")
+                    val self = links.getJSONObject("self")
+                    val href = self.getString("href")
+                    val id = href.split("/").last().toLong()
+                    result.add(Score(id, value.toInt()))
+                }
+                successCallback(result)
+            }
+
+            fun getScoreCascade(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, context: Context){
+                val queue = Volley.newRequestQueue(context)
+                getScoreStudent(score, position, successCallback, errorCallback, queue)
+            }
+
+            fun getScoreStudent(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+                val request = JsonObjectRequest(Request.Method.GET, "$url/${score.id}/student", null,
+                        Response.Listener<JSONObject> { processScoreStudentAndForwardToCourse(it,score, position, successCallback, errorCallback, queue) },
+                        Response.ErrorListener(errorCallback))
+                queue.add(request)
+            }
+
+            fun processScoreStudentAndForwardToCourse(studentJSONObject: JSONObject, score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+                val name = studentJSONObject.getString("name")
+                val links = studentJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                score.student = Student(id, name, null)
+                getScoreCourse(score, position, successCallback, errorCallback, queue)
+            }
+
+            fun getScoreCourse(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+                val request = JsonObjectRequest(Request.Method.GET, "$url/${score.id}/course", null,
+                        Response.Listener<JSONObject> { processScoreCourseAndForwardToTerm(it,score, position, successCallback, errorCallback, queue) },
+                        Response.ErrorListener(errorCallback))
+                queue.add(request)
+            }
+
+            fun processScoreCourseAndForwardToTerm(courseJSONObject: JSONObject, score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+                val name = courseJSONObject.getString("name")
+                val links = courseJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                score.course = Course(id, name, null)
+                getScoreTerm(score, position, successCallback, errorCallback, queue)
+            }
+
+            fun getScoreTerm(score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue){
+                val request = JsonObjectRequest(Request.Method.GET, "$url/${score.id}/term", null,
+                        Response.Listener<JSONObject> { processScoreTermAndReturn(it,score, position, successCallback, errorCallback, queue) },
+                        Response.ErrorListener(errorCallback))
+                queue.add(request)
+
+            }
+
+            fun processScoreTermAndReturn(termJSONObject: JSONObject, score: Score, position: Int, successCallback: (Score, Int) -> Unit, errorCallback: (VolleyError) -> Unit, queue: RequestQueue) {
+                val value = termJSONObject.getString("value")
+                val links = termJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                score.term = Term(id, value)
+                successCallback(score, position)
+            }
+
+            fun processScoreData(scoreJSONObject: JSONObject, successCallback: (Score) -> Unit) {
+                val value = scoreJSONObject.getString("value")
+                val links = scoreJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                successCallback(Score(id, value.toInt()))
+            }
+
+            fun postScore(score: Score, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val value = mapOf(Pair("value", score.value))
+                val jsonObject = JSONObject(value)
+                val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
+                        Response.Listener { successCallBack() },
+                        Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+
+            fun deleteScores(scores: List<Score>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val requestQueue = Volley.newRequestQueue(context)
+                scores.forEachIndexed { index, score ->
+                    val id = score.id
+                    val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
+                            null,
+                            Response.Listener<JSONObject> { if (index == scores.lastIndex) successCallback() },
+                            Response.ErrorListener { errorCallback(it) })
+                    requestQueue.add(request)
+                }
+            }
+
+            fun patchScore(score: Score, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
+                val data = mapOf(Pair("value", score.value))
+                val jsonObject = JSONObject(data)
+                val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${score.id}", jsonObject,
+                        Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
+                Volley.newRequestQueue(context).add(request)
+            }
+        }
+    }
+
 
 
 
