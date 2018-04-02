@@ -34,8 +34,25 @@ data class Course(val id: Long, val name: String, val collage: Collage?) : Data(
 
 data class Major(val id: Long, val name: String, val collage: Collage?) : Data()
 
-class Score(val id: Long, val value : Int, val course: Course, val student: Student, val term: Term) : Data(){
-    val name = "${student.name} - ${course.name} - ${term.value} $value"
+class Score(val id: Long, var name: String = "",  val value : Int) : Data(){
+    var student: Student? = null
+    set(value) = generateName()
+
+    var course: Course? = null
+    set(value) = generateName()
+
+    var term: Term? = null
+    set(value) = generateName()
+
+    fun generateName()
+    {
+        val fieldList = ArrayList<String>()
+        if(student != null) fieldList.add(student!!.name)
+        if(course != null) fieldList.add(course!!.name)
+        if(term != null) fieldList.add(term!!.value)
+        fieldList.add(value.toString())
+        name = fieldList.joinToString(" - ")
+    }
 }
 
 data class Term(val id: Long, val value: String) : Data()
