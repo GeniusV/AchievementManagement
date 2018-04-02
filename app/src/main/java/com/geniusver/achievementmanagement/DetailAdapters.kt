@@ -264,4 +264,9 @@ class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapt
 }
 
 
+class MiddleScoreDetailAdapter(context: Context, val student: Student? = null, val course: Course? = null, val term: Term?){
+
+}
+
+
 

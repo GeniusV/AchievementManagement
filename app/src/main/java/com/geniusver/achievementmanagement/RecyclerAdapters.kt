@@ -27,10 +27,9 @@ import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
-import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import com.android.volley.VolleyError
+import com.geniusver.achievementmanagement.R.id.refresh
 
 /**
  * Created by GeniusV on 3/24/18.
@@ -325,7 +324,7 @@ class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecycl
     }
 }
 
-class ScoreRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
+class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var course: Course? = null, var term: Term? = null, val displayMode: String = Score.FULL , val final: Boolean = false) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
 
     init {
         refresh()
@@ -336,19 +335,23 @@ class ScoreRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<ScoreRecy
     }
 
     override fun queryData(page: Int, size: Int, successCallback: (List<Score>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.ScoreRequester.getScores(page, size, context, ::queryCascadeData, ::errorHandle)
+        RequestCenter.ScoreRequester.getScores(page, size, context, ::queryCascadeData, ::errorHandle, student, course, term)
     }
 
     fun queryCascadeData(scoreList: List<Score>){
         scoreList.forEachIndexed{
             index, score -> RequestCenter.ScoreRequester.getScoreCascade(score, index, ::updateScoreCascade, ::errorHandle, context)
         }
-        add(scoreList)
     }
 
     fun updateScoreCascade(score: Score, position: Int){
-        values[position] = score
-        notifyItemChanged(position)
+        for (item in values) {
+            if(displayMode == Score.STUDENT && item.student?.id == score.student?.id) return
+            if (displayMode == Score.COURSE && item.course?.id == score.course?.id) return
+            if(displayMode == Score.TERM && item.term?.id == score.term?.id) return
+        }
+        values.add(score)
+        notifyItemChanged(values.lastIndex)
     }
 
     override fun newViewHolder(view: View): ScoreViewHolder {
@@ -359,7 +362,7 @@ class ScoreRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<ScoreRecy
         var mScore = values[position] as Score
         holder?.apply {
             score = mScore
-            textView.text = mScore.name
+            textView.text = mScore.getName(displayMode)
             imageView.setImageResource(R.drawable.ic_score)
         }
         super.onBindViewHolder(holder, position)
@@ -367,12 +370,17 @@ class ScoreRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<ScoreRecy
 
     override fun defaultItemViewClickListener(holder: ScoreViewHolder?, position: Int): View.OnClickListener {
         return View.OnClickListener {
-            val context = holder?.view?.context
-            val intent = Intent(context, ScoreEditActivity::class.java)
-            intent.putExtra(IntentKey.ITEM, holder?.score)
-            intent.putExtra(IntentKey.TYPE, "score")
-            intent.putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
-            context?.startActivity(intent)
+            if (final) {
+                val context = holder?.view?.context
+                val intent = Intent(context, ScoreEditActivity::class.java)
+                intent.putExtra(IntentKey.ITEM, holder?.score)
+                intent.putExtra(IntentKey.TYPE, "score")
+                intent.putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                context?.startActivity(intent)
+            }
+            else{
+
+            }
         }
     }
 

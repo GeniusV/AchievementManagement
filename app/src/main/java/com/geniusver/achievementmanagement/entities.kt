@@ -34,34 +34,42 @@ data class Course(val id: Long, val name: String, val collage: Collage?) : Data(
 
 data class Major(val id: Long, val name: String, val collage: Collage?) : Data()
 
-class Score(val id: Long, var value: Int, var name: String = "") : Data() {
+class Score(val id: Long, var value: Int ) : Data() {
     constructor(id: Long, value: Int, student: Student, course: Course, term: Term) : this(id, value)
 
     var student: Student? = null
-        set(value) {
-            field = value
-            generateName()
-        }
+
 
     var course: Course? = null
-        set(value) {
-            field = value
-            generateName()
-        }
+
 
     var term: Term? = null
-        set(value) {
-            field = value
-            generateName()
-        }
 
-    fun generateName() {
+    companion object {
+        const val FULL = "full"
+        const val STUDENT = "student"
+        const val COURSE = "course"
+        const val TERM = "term"
+    }
+
+
+    fun getFullName(): String {
         val fieldList = ArrayList<String>()
         if (student != null) fieldList.add(student!!.name)
         if (course != null) fieldList.add(course!!.name)
         if (term != null) fieldList.add(term!!.value)
-        fieldList.add(value.toString())
-        name = fieldList.joinToString(" - ")
+        return fieldList.joinToString(" - ")
+    }
+
+    fun getName(mode: String = FULL, displayValue: Boolean = false): String {
+        var displayString = ""
+        when (mode) {
+            STUDENT -> if (student != null) displayString = student!!.name else ""
+            COURSE -> if (course != null) displayString =  course!!.name else ""
+            TERM -> if(term != null) displayString = term!!.value else ""
+            else -> displayString = getFullName()
+        }
+        return if(displayValue) "$displayString - $value" else displayString
     }
 }
 

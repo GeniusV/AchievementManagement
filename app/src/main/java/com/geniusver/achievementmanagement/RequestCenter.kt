@@ -579,8 +579,18 @@ class RequestCenter {
     class ScoreRequester {
         companion object {
             val url = "$apiDomain/score"
-            fun getScores(page: Int, size: Int, context: Context, successCallback: (List<Score>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+            fun getScores(page: Int, size: Int, context: Context, successCallback: (List<Score>) -> Unit, errorCallback: (VolleyError) -> Unit, student: Student? = null, course: Course? = null, term: Term? = null) {
+                val fieldList = ArrayList<String>()
+                val paramList = ArrayList<String>()
+
+                if (student != null) fieldList.add("Student"); paramList.add("student=${StudentRequester.url}/${student?.id}")
+                if (course != null) fieldList.add("Course"); paramList.add("course=${CourseRequester.url}/${course?.id}")
+                if (term != null) fieldList.add("Term"); paramList.add("term=${TermRequester.url}/${term?.id}")
+
+                val methodName = "findBy" + fieldList.joinToString("And")
+                val paramString = "page=$page&size=$size&" + paramList.joinToString("&")
+
+                val request = JsonObjectRequest(Request.Method.GET, "$url/search/$methodName?$paramString",
                         null,
                         Response.Listener<JSONObject> { processScoresData(it, successCallback) },
                         Response.ErrorListener { errorCallback(it) })

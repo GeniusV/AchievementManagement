@@ -73,10 +73,6 @@ class MainActivity : AppCompatActivity(), Identifiable {
                 mAdapter = com.geniusver.achievementmanagement.TermRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
                 refreshList.add(this::refresh)
             }, "Term")
-            addFragment(com.geniusver.achievementmanagement.ContentFragment<com.geniusver.achievementmanagement.ScoreRecyclerAdapter.ScoreViewHolder, com.geniusver.achievementmanagement.Score>().apply {
-                mAdapter = com.geniusver.achievementmanagement.ScoreRecyclerAdapter(applicationContext).apply { setMultiChoiceToolbar(newMultiChoiceToolbar()) }
-                refreshList.add(this::refresh)
-            }, "Score")
         }
 
 
@@ -133,7 +129,7 @@ class MainActivity : AppCompatActivity(), Identifiable {
                     }
                     "score" -> addIntent = Intent(this, ScoreEditActivity::class.java).apply {
                         putExtra(IntentKey.ACTION, IntentValue.Action.INSERT)
-                        putExtra(IntentKey.ITEM, Score(0, 0, ""))
+                        putExtra(IntentKey.ITEM, Score(0, 0))
                     }
                 }
                 startActivityForResult(addIntent, identifier)

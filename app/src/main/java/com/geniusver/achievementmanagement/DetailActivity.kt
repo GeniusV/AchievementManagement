@@ -178,7 +178,16 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                     refreshList.add(this::refresh)
                     entityMap["student"] = this::entity
                 }
-                //TODO()
+
+                viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
+                    addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
+                        mAdapter = ScoreRecyclerAdapter(applicationContext, student = item, displayMode = Score.COURSE).apply {
+                            setMultiChoiceToolbar(newMultiChoiceToolbar())
+                        }
+                        refreshList.add(this::refresh)
+                        enableEdit = true
+                    }, "Course")
+                }
             }
         }
         tabs.setupWithViewPager(viewpaper)
