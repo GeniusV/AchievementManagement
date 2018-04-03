@@ -32,6 +32,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.ImageView
@@ -238,6 +239,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     abstract fun queryData(page: Int = 0, size: Int = 20, successCallback: (List<K>) -> Unit = ::add, errorCallback: (VolleyError) -> Unit = ::errorHandle)
 
     protected fun errorHandle(e: VolleyError) {
+        Log.e("RecyclerViewAdapter", e.toString(), e)
         Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
     }
 
@@ -318,6 +320,7 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     abstract fun queryDetail(successCallback: (K) -> Unit = ::replaceDetail, errorCallback: (VolleyError) -> Unit = ::errorHandle)
 
     protected fun errorHandle(e: VolleyError) {
+        Log.e("DetailAdapter", e.toString(), e)
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 
