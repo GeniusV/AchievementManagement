@@ -67,6 +67,16 @@ class IntentValue {
 
 }
 
+/**
+ * ContentFragment is responsible for the following features:
+ *  - Invoke deleteSelectedItem() of adapter extended from BaseRecyclerViewAdapter*
+ *  - Control the edit, add, delete, search button visibility when enable multiChoice mode.
+ *  - Set search type when switch the tab.
+ *
+ * @see BaseRecyclerViewAdapter
+ * @param T The ViewHolder type should be implemented
+ * @param K The Data type to display
+ */
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
     var enableEdit = false
@@ -87,6 +97,7 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
                 super.onScrolled(recyclerView, dx, dy)
                 val manager = rc.layoutManager as LinearLayoutManager
                 var lastPosition = manager.findLastVisibleItemPosition()
+                // load more data when left items is less than 20
                 if (lastPosition > mAdapter.itemCount - 20) {
                     mAdapter.loadMore()
                 }
@@ -166,8 +177,13 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
 
 
 /**
+ * This class implements most basic logic.
+ * You need to implement all abstract methods and following methods
  * override onBindViewHolder
  * override defaultItemViewClickListener
+ *
+ * @param T The ViewHolder type should be implemented
+ * @param K The Data type to display
  */
 abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(val context: Context) : MultiChoiceAdapter<T>() {
     protected val typedValue = TypedValue()
@@ -194,6 +210,9 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         return newViewHolder(view)
     }
 
+    /**
+     * Implement the method to return a T type ViewHolder
+     */
     abstract fun newViewHolder(view: View): T
 
 
@@ -219,7 +238,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     abstract fun queryData(page: Int = 0, size: Int = 20, successCallback: (List<K>) -> Unit = ::add, errorCallback: (VolleyError) -> Unit = ::errorHandle)
 
     protected fun errorHandle(e: VolleyError) {
-        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
     }
 
     protected fun deleteSuccessHandle() {
@@ -234,6 +253,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         deselectAll()
         performDelete(selectedData)
     }
+
 
     abstract fun performDelete(data: List<K>)
 }
@@ -260,6 +280,9 @@ class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 }
 
+/**
+ * Display detail message of K
+ */
 abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : RecyclerView.Adapter<DetailAdapter.DetailViewHolder>() {
     protected val typedValue = TypedValue()
     protected val background: Int

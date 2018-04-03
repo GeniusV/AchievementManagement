@@ -40,7 +40,7 @@ import org.json.JSONObject
 class RequestCenter {
 
     companion object {
-        val apiDomain = "http://192.168.1.109:8080"
+        val apiDomain = "http://172.20.10.2:8080"
     }
 
     class CollageRequester {
