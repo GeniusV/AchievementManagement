@@ -44,7 +44,7 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         RequestCenter.CollageRequester.deleteCollages(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Collage>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.CollageRequester.getCollages(page, size, context, ::add, ::errorHandle)
     }
 
@@ -98,7 +98,7 @@ class MajorRecyclerAdapter(context: Context, var collage: Collage? = null) : Bas
         RequestCenter.MajorRequester.deleteMajors(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Major>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.MajorRequester.getMajors(page, size, context, ::add, ::errorHandle, collage)
     }
 
@@ -145,7 +145,7 @@ class CourseRecyclerAdapter(context: Context, var collage: Collage? = null) : Ba
         RequestCenter.CourseRequester.deleteCourses(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Course>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Course>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.CourseRequester.getCourses(page, size, context, ::add, ::errorHandle, collage)
     }
 
@@ -192,7 +192,7 @@ class ClaxxRecyclerAdapter(context: Context, var major: Major? = null) : BaseRec
         RequestCenter.ClaxxRequester.deleteClaxxs(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Claxx>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Claxx>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.ClaxxRequester.getClaxxs(page, size, context, ::add, ::errorHandle, major)
     }
 
@@ -239,7 +239,7 @@ class StudentRecyclerAdapter(context: Context, var claxx: Claxx? = null) : BaseR
         RequestCenter.StudentRequester.deleteStudents(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Student>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.StudentRequester.getStudents(page, size, context, ::add, ::errorHandle, claxx)
     }
 
@@ -285,7 +285,7 @@ class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecycl
         RequestCenter.TermRequester.deleteTerms(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Term>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Term>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.TermRequester.getTerms(page, size, context, ::add, ::errorHandle)
     }
 
@@ -334,11 +334,12 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
         RequestCenter.ScoreRequester.deleteScores(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Score>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Score>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.ScoreRequester.getScores(page, size, context, ::queryCascadeData, ::errorHandle, student, course, term)
     }
 
-    fun queryCascadeData(scoreList: List<Score>){
+    fun queryCascadeData(scoreList: List<Score>, mSize: Int){
+        maxPage = mSize
         scoreList.forEachIndexed{
             index, score -> RequestCenter.ScoreRequester.getScoreCascade(score, index, ::updateScoreCascade, ::errorHandle, context)
         }

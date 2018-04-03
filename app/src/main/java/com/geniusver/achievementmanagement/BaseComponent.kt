@@ -192,6 +192,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     protected var values = ArrayList<K>()
     protected val size = 20
     protected var page = 0
+    protected var maxPage = 100
 
 
     init {
@@ -218,6 +219,9 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
 
 
     fun loadMore() {
+        if (page >= maxPage) {
+            return
+        }
         queryData(page + 1, size)
         page++
     }
@@ -228,7 +232,8 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         page = 0
     }
 
-    protected fun add(datas: List<K>) {
+    protected fun add(datas: List<K>, mSize: Int) {
+        maxPage = mSize
         values.addAll(datas)
         notifyDataSetChanged()
     }
@@ -236,7 +241,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     /**
      * if request success will call add(datas: List<Data>), else print error
      */
-    abstract fun queryData(page: Int = 0, size: Int = 20, successCallback: (List<K>) -> Unit = ::add, errorCallback: (VolleyError) -> Unit = ::errorHandle)
+    abstract fun queryData(page: Int = 0, size: Int = 20, successCallback: (List<K>, Int) -> Unit = ::add, errorCallback: (VolleyError) -> Unit = ::errorHandle)
 
     protected fun errorHandle(e: VolleyError) {
         Log.e("RecyclerViewAdapter", e.toString(), e)
