@@ -41,7 +41,7 @@ import org.json.JSONObject
 class RequestCenter {
 
     companion object {
-        val apiDomain = "http://192.168.1.109:8080"
+        val apiDomain = "http://192.168.0.101:8080"
     }
 
     class CollageRequester {
@@ -597,7 +597,7 @@ class RequestCenter {
                 if (term != null) fieldList.add("Term"); paramList.add("term=${TermRequester.url}/${term?.id}")
 
                 val methodName = "findBy" + fieldList.joinToString("And")
-                val paramString = "page=$page&size=$size&" + paramList.joinToString("&")
+                val paramString = "&projection=scoreProjection&page=$page&size=$size&" + paramList.joinToString("&")
 
                 val request = JsonObjectRequest(Request.Method.GET, "$url/search/$methodName?$paramString",
                         null,
@@ -608,7 +608,7 @@ class RequestCenter {
 
             private fun processScoresData(scoreJSONObject: JSONObject, successCallback: (List<Score>, Int) -> Unit) {
                 val embedded = scoreJSONObject.getJSONObject("_embedded")
-                val score: JSONArray = embedded.getJSONArray("score")
+                val score = embedded.getJSONArray("score")
                 val result = ArrayList<Score>()
                 for (i in 0 until score.length()) {
                     val value = score.getJSONObject(i).getString("value")
@@ -616,7 +616,26 @@ class RequestCenter {
                     val self = links.getJSONObject("self")
                     val href = self.getString("href")
                     val id = href.split("/").last().toLong()
-                    result.add(Score(id, value.toInt()))
+
+                    val student = score.getJSONObject(i).getJSONObject("student")
+                    val studentId = student.getLong("id")
+                    val studentName = student.getString("name")
+
+                    val course = score.getJSONObject(i).getJSONObject("course")
+                    val courseId = course.getLong("id")
+                    val courseName = course.getString("name")
+
+                    val term = score.getJSONObject(i).getJSONObject("term")
+                    val termId = term.getLong("id")
+                    val termValue = term.getString("value")
+
+                    var scoreObject = Score(id, value.toInt()).apply {
+                        this.student = Student(studentId, studentName, null)
+                        this.course = Course(courseId, courseName, null)
+                        this.term = Term(termId, termValue)
+                    }
+
+                    result.add(scoreObject)
                 }
                 successCallback(result, getMaxPageSize(scoreJSONObject))
             }

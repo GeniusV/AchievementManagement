@@ -29,7 +29,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.volley.VolleyError
-import com.geniusver.achievementmanagement.R.id.refresh
 
 /**
  * Created by GeniusV on 3/24/18.
@@ -324,7 +323,7 @@ class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecycl
     }
 }
 
-class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var course: Course? = null, var term: Term? = null, val displayMode: String = Score.FULL , val final: Boolean = false) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
+class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var course: Course? = null, var term: Term? = null, val displayMode: String = Score.FULL, val final: Boolean = false) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
 
     init {
         refresh()
@@ -335,24 +334,30 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
     }
 
     override fun queryData(page: Int, size: Int, successCallback: (List<Score>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.ScoreRequester.getScores(page, size, context, ::queryCascadeData, ::errorHandle, student, course, term)
+        RequestCenter.ScoreRequester.getScores(page, size, context, ::appendValue, ::errorHandle, student, course, term)
     }
 
-    fun queryCascadeData(scoreList: List<Score>, mSize: Int){
+    fun appendValue(scoreList: List<Score>, mSize: Int) {
         maxPage = mSize
-        scoreList.forEachIndexed{
-            index, score -> RequestCenter.ScoreRequester.getScoreCascade(score, index, ::updateScoreCascade, ::errorHandle, context)
+        for (score in scoreList) {
+            if (!isCascadeIdExist(displayMode, score) || final) {
+                values.add(score)
+            }
         }
+        notifyDataSetChanged()
     }
 
-    fun updateScoreCascade(score: Score, position: Int){
-        for (item in values) {
-            if(displayMode == Score.STUDENT && item.student?.id == score.student?.id) return
-            if (displayMode == Score.COURSE && item.course?.id == score.course?.id) return
-            if(displayMode == Score.TERM && item.term?.id == score.term?.id) return
+    fun isCascadeIdExist(type: String, score: Score): Boolean {
+        when (type) {
+            Score.STUDENT -> {
+                values.forEach {
+                    if (it.student?.id == score.student?.id) return true
+                }
+            }
+            Score.COURSE -> values.forEach{ if(it.course?.id == score.course?.id) return true}
+            Score.TERM -> values.forEach{ if(it.term?.id == score.term?.id) return true}
         }
-        values.add(score)
-        notifyItemChanged(values.lastIndex)
+        return false
     }
 
     override fun newViewHolder(view: View): ScoreViewHolder {
@@ -379,11 +384,10 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
                     putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                 }
                 context?.startActivity(intent)
-            }
-            else{
+            } else {
                 val intent = Intent(context, DetailActivity::class.java).apply {
                     putExtra("student", student != null || displayMode == Score.STUDENT)
-                    putExtra("course",  course != null || displayMode == Score.COURSE)
+                    putExtra("course", course != null || displayMode == Score.COURSE)
                     putExtra("term", term != null || displayMode == Score.TERM)
                     putExtra(IntentKey.ITEM, holder?.score)
                     putExtra(IntentKey.TYPE, "score")
