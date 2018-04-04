@@ -29,6 +29,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.volley.VolleyError
+import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
 
 /**
  * Created by GeniusV on 3/24/18.
@@ -329,8 +330,33 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
         refresh()
     }
 
+
     override fun performDelete(data: List<Score>) {
-        RequestCenter.ScoreRequester.deleteScores(data, context, ::deleteSuccessHandle, ::errorHandle)
+        if (final) {
+            RequestCenter.ScoreRequester.deleteScores(context, ::deleteSuccessHandle, ::errorHandle, scores = data)
+        }
+    }
+
+    override fun setMultiChoiceSelectionListener(listener: Listener?) {
+        if (final) {
+            super.setMultiChoiceSelectionListener(listener)
+        } else {
+            super.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener{
+                override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
+                }
+
+                override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
+                }
+
+                override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                    deselectAll()
+                }
+
+                override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                }
+
+            })
+        }
     }
 
     override fun queryData(page: Int, size: Int, successCallback: (List<Score>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {

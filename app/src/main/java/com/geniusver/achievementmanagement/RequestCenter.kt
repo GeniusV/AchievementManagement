@@ -724,9 +724,9 @@ class RequestCenter {
                 Volley.newRequestQueue(context).add(request)
             }
 
-            fun deleteScores(scores: List<Score>, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit, student: Student? = null, course: Course? = null, term: Term? = null) {
+            fun deleteScores(context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit,scores: List<Score>? = null, student: Student? = null, course: Course? = null, term: Term? = null) {
                 val requestQueue = Volley.newRequestQueue(context)
-                scores.forEachIndexed { index, score ->
+                scores?.forEachIndexed { index, score ->
                     val id = score.id
                     val request = PostJsonObjectRequest(Request.Method.DELETE, "$url/$id",
                             null,
