@@ -84,6 +84,7 @@ class ClaxxEditActivity : AppCompatActivity() {
                 setMessage("major ID is not valid.")
                 setPositiveButton("Ok", { _, _ -> Unit })
             }.create().show()
+            return
         }
         RequestCenter.MajorRequester.getMajor(this, ::sendClaxx, {
             AlertDialog.Builder(this).apply {
