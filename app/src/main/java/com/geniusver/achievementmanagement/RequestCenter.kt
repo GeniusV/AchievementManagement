@@ -641,8 +641,8 @@ class RequestCenter {
             }
 
             fun postScore(score: Score, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val value = mapOf(Pair("value", score.value))
-                val jsonObject = JSONObject(value)
+                val data = mapOf(Pair("value", score.value), Pair("student", "${StudentRequester.url}/${score.student?.id}"), Pair("course", "${CourseRequester.url}/${score.course?.id}"), Pair("term", "${TermRequester.url}/${score.term?.id}") )
+                val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
                         Response.Listener { successCallBack() },
                         Response.ErrorListener { errorCallback(it) })
@@ -662,7 +662,7 @@ class RequestCenter {
             }
 
             fun patchScore(score: Score, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf(Pair("value", score.value))
+                val data = mapOf(Pair("value", score.value), Pair("student", "${StudentRequester.url}/${score.student?.id}"), Pair("course", "${CourseRequester.url}/${score.course?.id}"), Pair("term", "${TermRequester.url}/${score.term?.id}") )
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${score.id}", jsonObject,
                         Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })

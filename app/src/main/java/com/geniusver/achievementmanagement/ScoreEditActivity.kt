@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_score_edit.*
 import kotlinx.android.synthetic.main.edit_header.*
 
@@ -130,7 +131,7 @@ class ScoreEditActivity : AppCompatActivity() {
             }.create().show()
             return
         }
-        mScore.course = Course(termId, "", null)
+        mScore.term = Term(termId, "")
         RequestCenter.TermRequester.getTerm(this, ::sendScore, {
             AlertDialog.Builder(this).apply {
                 setMessage("Term ID: $termId is not exist.")
@@ -152,18 +153,17 @@ class ScoreEditActivity : AppCompatActivity() {
         mScore.value = scoreValue
         if (action == IntentValue.Action.INSERT) {
             RequestCenter.ScoreRequester.postScore(mScore, applicationContext,
-                    { setResult(Activity.RESULT_OK); finish() }, {
+                    { Toast.makeText(this, "Insert Ok, please refresh...", Toast.LENGTH_SHORT).show(); setResult(Activity.RESULT_OK); finish() }, {
                 AlertDialog.Builder(this).apply {
-                    setMessage(it.message)
+                    setMessage(it.toString())
                     setPositiveButton("Ok", { _, _ -> Unit })
                 }.create().show()
             })
         } else {
-            val score = intent.getSerializableExtra(IntentKey.ITEM) as Score
-            RequestCenter.ScoreRequester.patchScore(Score(score.id, scoreValue), applicationContext,
-                    { setResult(Activity.RESULT_OK); finish() }, {
+            RequestCenter.ScoreRequester.patchScore(mScore, applicationContext,
+                    { Toast.makeText(this, "Update Ok, please refresh...", Toast.LENGTH_SHORT).show();setResult(Activity.RESULT_OK); finish() }, {
                 AlertDialog.Builder(this).apply {
-                    setMessage(it.message)
+                    setMessage(it.toString())
                     setPositiveButton("Ok", { _, _ -> Unit })
                 }.create().show()
             })
