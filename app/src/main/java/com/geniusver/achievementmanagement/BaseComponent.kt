@@ -32,6 +32,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.ImageView
@@ -67,6 +68,16 @@ class IntentValue {
 
 }
 
+/**
+ * ContentFragment is responsible for the following features:
+ *  - Invoke deleteSelectedItem() of adapter extended from BaseRecyclerViewAdapter*
+ *  - Control the edit, add, delete, search button visibility when enable multiChoice mode.
+ *  - Set search type when switch the tab.
+ *
+ * @see BaseRecyclerViewAdapter
+ * @param T The ViewHolder type should be implemented
+ * @param K The Data type to display
+ */
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
     var enableEdit = false
@@ -87,6 +98,7 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
                 super.onScrolled(recyclerView, dx, dy)
                 val manager = rc.layoutManager as LinearLayoutManager
                 var lastPosition = manager.findLastVisibleItemPosition()
+                // load more data when left items is less than 20
                 if (lastPosition > mAdapter.itemCount - 20) {
                     mAdapter.loadMore()
                 }
@@ -166,8 +178,13 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
 
 
 /**
+ * This class implements most basic logic.
+ * You need to implement all abstract methods and following methods
  * override onBindViewHolder
  * override defaultItemViewClickListener
+ *
+ * @param T The ViewHolder type should be implemented
+ * @param K The Data type to display
  */
 abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(val context: Context) : MultiChoiceAdapter<T>() {
     protected val typedValue = TypedValue()
@@ -175,6 +192,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     protected var values = ArrayList<K>()
     protected val size = 20
     protected var page = 0
+    protected var maxPage = 100
 
 
     init {
@@ -194,10 +212,16 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         return newViewHolder(view)
     }
 
+    /**
+     * Implement the method to return a T type ViewHolder
+     */
     abstract fun newViewHolder(view: View): T
 
 
     fun loadMore() {
+        if (page >= maxPage) {
+            return
+        }
         queryData(page + 1, size)
         page++
     }
@@ -208,7 +232,8 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         page = 0
     }
 
-    protected fun add(datas: List<K>) {
+    protected fun add(datas: List<K>, mSize: Int) {
+        maxPage = mSize
         values.addAll(datas)
         notifyDataSetChanged()
     }
@@ -216,10 +241,11 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
     /**
      * if request success will call add(datas: List<Data>), else print error
      */
-    abstract fun queryData(page: Int = 0, size: Int = 20, successCallback: (List<K>) -> Unit = ::add, errorCallback: (VolleyError) -> Unit = ::errorHandle)
+    abstract fun queryData(page: Int = 0, size: Int = 20, successCallback: (List<K>, Int) -> Unit = ::add, errorCallback: (VolleyError) -> Unit = ::errorHandle)
 
     protected fun errorHandle(e: VolleyError) {
-        Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        Log.e("RecyclerViewAdapter", e.toString(), e)
+        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show()
     }
 
     protected fun deleteSuccessHandle() {
@@ -234,6 +260,7 @@ abstract class BaseRecyclerViewAdapter<T : RecyclerView.ViewHolder, K : Data>(va
         deselectAll()
         performDelete(selectedData)
     }
+
 
     abstract fun performDelete(data: List<K>)
 }
@@ -260,6 +287,9 @@ class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 }
 
+/**
+ * Display detail message of K
+ */
 abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : RecyclerView.Adapter<DetailAdapter.DetailViewHolder>() {
     protected val typedValue = TypedValue()
     protected val background: Int
@@ -295,6 +325,7 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     abstract fun queryDetail(successCallback: (K) -> Unit = ::replaceDetail, errorCallback: (VolleyError) -> Unit = ::errorHandle)
 
     protected fun errorHandle(e: VolleyError) {
+        Log.e("DetailAdapter", e.toString(), e)
         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
     }
 

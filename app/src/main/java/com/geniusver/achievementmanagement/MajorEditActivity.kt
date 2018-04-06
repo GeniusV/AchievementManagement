@@ -84,6 +84,7 @@ class MajorEditActivity : AppCompatActivity() {
                 setMessage("collage ID is not valid.")
                 setPositiveButton("Ok", { _, _ -> Unit })
             }.create().show()
+            return
         }
         RequestCenter.CollageRequester.getCollage(this, ::sendMajor, {
             AlertDialog.Builder(this).apply {

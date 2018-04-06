@@ -29,7 +29,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.volley.VolleyError
-import com.geniusver.achievementmanagement.R.id.refresh
+import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter
 
 /**
  * Created by GeniusV on 3/24/18.
@@ -44,7 +44,7 @@ class CollageRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<Collage
         RequestCenter.CollageRequester.deleteCollages(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Collage>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Collage>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.CollageRequester.getCollages(page, size, context, ::add, ::errorHandle)
     }
 
@@ -98,7 +98,7 @@ class MajorRecyclerAdapter(context: Context, var collage: Collage? = null) : Bas
         RequestCenter.MajorRequester.deleteMajors(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Major>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Major>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.MajorRequester.getMajors(page, size, context, ::add, ::errorHandle, collage)
     }
 
@@ -145,7 +145,7 @@ class CourseRecyclerAdapter(context: Context, var collage: Collage? = null) : Ba
         RequestCenter.CourseRequester.deleteCourses(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Course>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Course>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.CourseRequester.getCourses(page, size, context, ::add, ::errorHandle, collage)
     }
 
@@ -192,7 +192,7 @@ class ClaxxRecyclerAdapter(context: Context, var major: Major? = null) : BaseRec
         RequestCenter.ClaxxRequester.deleteClaxxs(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Claxx>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Claxx>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.ClaxxRequester.getClaxxs(page, size, context, ::add, ::errorHandle, major)
     }
 
@@ -239,7 +239,7 @@ class StudentRecyclerAdapter(context: Context, var claxx: Claxx? = null) : BaseR
         RequestCenter.StudentRequester.deleteStudents(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Student>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Student>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.StudentRequester.getStudents(page, size, context, ::add, ::errorHandle, claxx)
     }
 
@@ -285,7 +285,7 @@ class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecycl
         RequestCenter.TermRequester.deleteTerms(data, context, ::deleteSuccessHandle, ::errorHandle)
     }
 
-    override fun queryData(page: Int, size: Int, successCallback: (List<Term>) -> Unit, errorCallback: (VolleyError) -> Unit) {
+    override fun queryData(page: Int, size: Int, successCallback: (List<Term>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
         RequestCenter.TermRequester.getTerms(page, size, context, ::add, ::errorHandle)
     }
 
@@ -324,34 +324,66 @@ class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecycl
     }
 }
 
-class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var course: Course? = null, var term: Term? = null, val displayMode: String = Score.FULL , val final: Boolean = false) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
+class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var course: Course? = null, var term: Term? = null, val displayMode: String = Score.FULL, val final: Boolean = false) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
 
     init {
         refresh()
     }
 
+
     override fun performDelete(data: List<Score>) {
-        RequestCenter.ScoreRequester.deleteScores(data, context, ::deleteSuccessHandle, ::errorHandle)
-    }
-
-    override fun queryData(page: Int, size: Int, successCallback: (List<Score>) -> Unit, errorCallback: (VolleyError) -> Unit) {
-        RequestCenter.ScoreRequester.getScores(page, size, context, ::queryCascadeData, ::errorHandle, student, course, term)
-    }
-
-    fun queryCascadeData(scoreList: List<Score>){
-        scoreList.forEachIndexed{
-            index, score -> RequestCenter.ScoreRequester.getScoreCascade(score, index, ::updateScoreCascade, ::errorHandle, context)
+        if (final) {
+            RequestCenter.ScoreRequester.deleteScores(context, ::deleteSuccessHandle, ::errorHandle, scores = data)
         }
     }
 
-    fun updateScoreCascade(score: Score, position: Int){
-        for (item in values) {
-            if(displayMode == Score.STUDENT && item.student?.id == score.student?.id) return
-            if (displayMode == Score.COURSE && item.course?.id == score.course?.id) return
-            if(displayMode == Score.TERM && item.term?.id == score.term?.id) return
+    override fun setMultiChoiceSelectionListener(listener: Listener?) {
+        if (final) {
+            super.setMultiChoiceSelectionListener(listener)
+        } else {
+            super.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener{
+                override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
+                }
+
+                override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
+                }
+
+                override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                    deselectAll()
+                }
+
+                override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                }
+
+            })
         }
-        values.add(score)
-        notifyItemChanged(values.lastIndex)
+    }
+
+    override fun queryData(page: Int, size: Int, successCallback: (List<Score>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
+        RequestCenter.ScoreRequester.getScores(page, size, context, ::appendValue, ::errorHandle, student, course, term)
+    }
+
+    fun appendValue(scoreList: List<Score>, mSize: Int) {
+        maxPage = mSize
+        for (score in scoreList) {
+            if (!isCascadeIdExist(displayMode, score) || final) {
+                values.add(score)
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    fun isCascadeIdExist(type: String, score: Score): Boolean {
+        when (type) {
+            Score.STUDENT -> {
+                values.forEach {
+                    if (it.student?.id == score.student?.id) return true
+                }
+            }
+            Score.COURSE -> values.forEach{ if(it.course?.id == score.course?.id) return true}
+            Score.TERM -> values.forEach{ if(it.term?.id == score.term?.id) return true}
+        }
+        return false
     }
 
     override fun newViewHolder(view: View): ScoreViewHolder {
@@ -378,11 +410,10 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
                     putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
                 }
                 context?.startActivity(intent)
-            }
-            else{
+            } else {
                 val intent = Intent(context, DetailActivity::class.java).apply {
                     putExtra("student", student != null || displayMode == Score.STUDENT)
-                    putExtra("course",  course != null || displayMode == Score.COURSE)
+                    putExtra("course", course != null || displayMode == Score.COURSE)
                     putExtra("term", term != null || displayMode == Score.TERM)
                     putExtra(IntentKey.ITEM, holder?.score)
                     putExtra(IntentKey.TYPE, "score")
