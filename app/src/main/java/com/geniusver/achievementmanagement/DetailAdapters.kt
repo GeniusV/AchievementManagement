@@ -53,7 +53,7 @@ class CollageDetailAdapter(context: Context, val collage: Collage) : DetailAdapt
 
 class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Major>(context, major) {
 
-    lateinit var mcollage: Collage
+    var mcollage: Collage = Collage(0, "")
 
     init {
         ensureCollageName()
@@ -91,6 +91,7 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
         get() = major.id
 
     override fun generateList() {
+        if (entity.collage?.name == null) entity = Major(entity.id, entity.name, mcollage)
         values = listOf(
                 DetailAdapter.DetailData("ID: " + entity.id, false),
                 DetailAdapter.DetailData("Name: " + entity.name, false),
@@ -107,7 +108,7 @@ class MajorDetailAdapter(context: Context, val major: Major) : DetailAdapter<Maj
 
 class CourseDetailAdapter(context: Context, val course: Course) : DetailAdapter<Course>(context, course) {
 
-    lateinit var mcollage: Collage
+    var mcollage: Collage = Collage(0, "")
 
     init {
         ensureCollageName()
@@ -137,14 +138,15 @@ class CourseDetailAdapter(context: Context, val course: Course) : DetailAdapter<
     }
 
     override fun refresh() {
-        ensureCollageName()
         super.refresh()
+        ensureCollageName()
     }
 
     override val id: Long
         get() = course.id
 
     override fun generateList() {
+        if (entity.collage?.name == null) entity = Course(entity.id, entity.name, mcollage)
         values = listOf(
                 DetailAdapter.DetailData("ID: " + entity.id, false),
                 DetailAdapter.DetailData("Name: " + entity.name, false),
@@ -160,7 +162,7 @@ class CourseDetailAdapter(context: Context, val course: Course) : DetailAdapter<
 
 class ClaxxDetailAdapter(context: Context, val claxx: Claxx) : DetailAdapter<Claxx>(context, claxx) {
 
-    lateinit var mmajor: Major
+    var mmajor: Major = Major(0, "", null)
 
     init {
         ensureMajorName()
@@ -198,6 +200,7 @@ class ClaxxDetailAdapter(context: Context, val claxx: Claxx) : DetailAdapter<Cla
         get() = claxx.id
 
     override fun generateList() {
+        if(entity.major?.name  == null) entity = Claxx(entity.id, entity.name, mmajor)
         values = listOf(
                 DetailAdapter.DetailData("ID: " + entity.id, false),
                 DetailAdapter.DetailData("Name: " + entity.name, false),
@@ -213,7 +216,7 @@ class ClaxxDetailAdapter(context: Context, val claxx: Claxx) : DetailAdapter<Cla
 
 class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapter<Student>(context, student) {
 
-    lateinit var mclaxx: Claxx
+    var mclaxx: Claxx = Claxx(0, "", null)
 
     init {
         ensureClaxxName()
@@ -251,6 +254,7 @@ class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapt
         get() = student.id
 
     override fun generateList() {
+        if (entity.claxx?.name == null) entity = Student(entity.id, entity.name, mclaxx)
         values = listOf(
                 DetailAdapter.DetailData("ID: " + entity.id, false),
                 DetailAdapter.DetailData("Name: " + entity.name, false),

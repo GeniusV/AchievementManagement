@@ -143,9 +143,10 @@ class MainActivity : AppCompatActivity(), Identifiable {
             identifier -> {
                 if (resultCode == Activity.RESULT_OK) {
                     refresh.callOnClick()
-                } else {
-                    Toast.makeText(this, "response failed", Toast.LENGTH_SHORT).show()
                 }
+//                else {
+//                    Toast.makeText(this, "response failed", Toast.LENGTH_SHORT).show()
+//                }
             }
         }
     }
