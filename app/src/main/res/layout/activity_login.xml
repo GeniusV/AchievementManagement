@@ -20,24 +20,34 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-
-
-<android.support.design.widget.AppBarLayout
+<RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:elevation="0dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-    <android.support.v7.widget.Toolbar
+    <include layout="@layout/edit_header"/>
+
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:id="@+id/toolbar"
-            android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_scrollFlags="enterAlways"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/appbar">
 
-</android.support.design.widget.AppBarLayout>
+        <android.support.design.widget.TabLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tabs"
+                app:tabTextAppearance="@style/MyTabLayoutTextAppearance"
+                android:background="@color/colorPrimary"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="@color/tabSelected"/>
 
+        <android.support.v4.view.ViewPager
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/viewpaper"/>
+    </LinearLayout>
+
+</RelativeLayout>

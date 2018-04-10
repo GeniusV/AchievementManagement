@@ -95,8 +95,9 @@ class StudentEditActivity : AppCompatActivity() {
 
 
     fun sendStudent(claxx: Claxx) {
+        val studentPassword = student_password.text.toString().trim()
         if (action == IntentValue.Action.INSERT) {
-            RequestCenter.StudentRequester.postStudent(Student(0, student_name.text.toString(), claxx), applicationContext,
+            RequestCenter.StudentRequester.postStudent(Student(0, student_name.text.toString(), claxx, studentPassword), applicationContext,
                     { setResult(Activity.RESULT_OK); finish() }, {
                 AlertDialog.Builder(this).apply {
                     setMessage("Name already exists!!")
@@ -105,7 +106,7 @@ class StudentEditActivity : AppCompatActivity() {
             })
         } else {
             val student = intent.getSerializableExtra(IntentKey.ITEM) as Student
-            RequestCenter.StudentRequester.patchStudent(Student(student.id, student_name.text.toString(), claxx), applicationContext,
+            RequestCenter.StudentRequester.patchStudent(Student(student.id, student_name.text.toString(), claxx, studentPassword), applicationContext,
                     { setResult(Activity.RESULT_OK); finish() }, {
                 AlertDialog.Builder(this).apply {
                     setMessage("Name already exists!!")

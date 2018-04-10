@@ -26,7 +26,7 @@ package com.geniusver.achievementmanagement
  * Created by GeniusV on 3/24/18.
  */
 
-data class Student(val id: Long, val name: String, val claxx: Claxx?) : Data()
+data class Student(val id: Long, val name: String, val claxx: Claxx?, var password:String = "") : Data()
 
 data class Claxx(val id: Long, val name: String, val major: Major?) : Data()
 

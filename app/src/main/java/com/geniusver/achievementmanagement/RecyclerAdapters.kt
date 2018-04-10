@@ -324,7 +324,7 @@ class TermRecyclerAdapter(context: Context) : BaseRecyclerViewAdapter<TermRecycl
     }
 }
 
-class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var course: Course? = null, var term: Term? = null, val displayMode: String = Score.FULL, val final: Boolean = false) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
+class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var course: Course? = null, var term: Term? = null, val displayMode: String = Score.FULL, val final: Boolean = false, var isAdmin: Boolean = true) : BaseRecyclerViewAdapter<ScoreRecyclerAdapter.ScoreViewHolder, Score>(context) {
 
     init {
         refresh()
@@ -404,10 +404,12 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
         return View.OnClickListener {
             val context = holder?.view?.context
             if (final) {
+                if(!isAdmin) return@OnClickListener
                 val intent = Intent(context, ScoreEditActivity::class.java).apply {
                     putExtra(IntentKey.ITEM, holder?.score)
                     putExtra(IntentKey.TYPE, "score")
                     putExtra(IntentKey.ACTION, IntentValue.Action.UPDATE)
+                    putExtra(IntentKey.IS_ADMIN, isAdmin)
                 }
                 context?.startActivity(intent)
             } else {
@@ -417,6 +419,7 @@ class ScoreRecyclerAdapter(context: Context, var student: Student? = null, var c
                     putExtra("term", term != null || displayMode == Score.TERM)
                     putExtra(IntentKey.ITEM, holder?.score)
                     putExtra(IntentKey.TYPE, "score")
+                    putExtra(IntentKey.IS_ADMIN, isAdmin)
                 }
                 context?.startActivity(intent)
             }

@@ -214,7 +214,7 @@ class ClaxxDetailAdapter(context: Context, val claxx: Claxx) : DetailAdapter<Cla
     }
 }
 
-class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapter<Student>(context, student) {
+class StudentDetailAdapter(context: Context, val student: Student, isAdmin: Boolean = true) : DetailAdapter<Student>(context, student, isAdmin = isAdmin) {
 
     var mclaxx: Claxx = Claxx(0, "", null)
 
@@ -235,7 +235,7 @@ class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapt
     override fun defaultItemViewClickListener(view: View): View.OnClickListener {
         return View.OnClickListener {
             if (view.findViewById<TextView>(R.id.detail_text).text.toString().startsWith("claxx") &&
-                    view.findViewById<ImageView>(R.id.detail_icon).visibility == View.VISIBLE) {
+                    view.findViewById<ImageView>(R.id.detail_icon).visibility == View.VISIBLE && isAdmin) {
                 val intent = Intent(context, DetailActivity::class.java).apply {
                     putExtra(IntentKey.TYPE, "claxx")
                     putExtra(IntentKey.ITEM, mclaxx)
@@ -269,7 +269,7 @@ class StudentDetailAdapter(context: Context, val student: Student) : DetailAdapt
 }
 
 
-class ScoreDetailAdapter(context: Context, val score: Score, val isStudentChosed: Boolean = false, val isCourseChosed: Boolean = false, val isTermChosed: Boolean = false ): DetailAdapter<Score>(context, score){
+class ScoreDetailAdapter(context: Context, val score: Score, val isStudentChosed: Boolean = false, val isCourseChosed: Boolean = false, val isTermChosed: Boolean = false, isAdmin: Boolean = true): DetailAdapter<Score>(context, score, isAdmin = isAdmin){
 
     init {
         generateList()
@@ -286,15 +286,15 @@ class ScoreDetailAdapter(context: Context, val score: Score, val isStudentChosed
         return View.OnClickListener {
             val clickedString = view.findViewById<TextView>(R.id.detail_text).text.toString()
             var intent = Intent()
-            if (clickedString.startsWith("Student")) intent = Intent(context, DetailActivity::class.java).apply {
+            if (clickedString.startsWith("Student") && isAdmin) intent = Intent(context, DetailActivity::class.java).apply {
                 putExtra(IntentKey.TYPE, "student")
                 putExtra(IntentKey.ITEM, entity.student)
             }
-            if (clickedString.startsWith("Course")) intent = Intent(context, DetailActivity::class.java).apply {
+            if (clickedString.startsWith("Course") && isAdmin) intent = Intent(context, DetailActivity::class.java).apply {
                 putExtra(IntentKey.TYPE, "course")
                 putExtra(IntentKey.ITEM, entity.course)
             }
-            if (clickedString.startsWith("Term")) intent = Intent(context, DetailActivity::class.java).apply {
+            if (clickedString.startsWith("Term") && isAdmin) intent = Intent(context, DetailActivity::class.java).apply {
                 putExtra(IntentKey.TYPE, "term")
                 putExtra(IntentKey.ITEM, entity.term)
             }
