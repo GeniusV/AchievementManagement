@@ -22,13 +22,41 @@
 
 package com.geniusver.achievementmanagement
 
-import android.support.v7.app.AppCompatActivity
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import kotlinx.android.synthetic.main.login_admin.*
 
-class StudentActivity : AppCompatActivity() {
+/**
+ * Created by GeniusV on 4/9/18.
+ */
+
+class AdminLoginFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_student)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater?.inflate(R.layout.login_admin, container, false)
+        view?.findViewById<Button>(R.id.login)?.setOnClickListener {
+            val password = student_password.text.toString()
+            if (password == "123456") {
+                val intent = Intent(context, MainActivity::class.java)
+                startActivity(intent)
+            } else {
+                AlertDialog.Builder(context).apply {
+                    setMessage("The password is wrong!!")
+                    setPositiveButton("Ok", { _, _ -> Unit })
+                }.create().show()
+            }
+        }
+        return view
     }
 }

@@ -54,6 +54,7 @@ class IntentKey {
         const val TYPE = "type"
         const val ITEM = "item"
         const val ACTION = "action"
+        const val IS_ADMIN = "isAdmin"
     }
 }
 
@@ -81,6 +82,7 @@ class IntentValue {
 open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
     lateinit var mAdapter: BaseRecyclerViewAdapter<T, K>
     var enableEdit = false
+    var isMenuEnable = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -135,35 +137,42 @@ open class ContentFragment<T : RecyclerView.ViewHolder, K : Data> : Fragment() {
         })
 
         if (enableEdit) menu.findItem(R.id.menu_edit)?.isVisible = true
-        mAdapter.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener {
-            override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
-                menu.findItem(R.id.menu_trash)?.isVisible = false
-                menu.findItem(R.id.menu_add)?.isVisible = true
-                menu.findItem(R.id.search)?.isVisible = true
-                menu.findItem(R.id.menu_edit)?.isVisible = true
-            }
-
-            override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
-            }
-
-            override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
-                menu.findItem(R.id.menu_trash)?.isVisible = true
-                menu.findItem(R.id.menu_add)?.isVisible = false
-                menu.findItem(R.id.menu_edit)?.isVisible = false
-                menu.findItem(R.id.search)?.isVisible = false
-
-            }
-
-            override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
-                if (itemSelectedCount == 0) {
+        if (isMenuEnable){
+            mAdapter.setMultiChoiceSelectionListener(object : MultiChoiceAdapter.Listener {
+                override fun OnDeselectAll(itemSelectedCount: Int, allItemCount: Int) {
                     menu.findItem(R.id.menu_trash)?.isVisible = false
                     menu.findItem(R.id.menu_add)?.isVisible = true
-                    menu.findItem(R.id.menu_edit)?.isVisible = true
                     menu.findItem(R.id.search)?.isVisible = true
+                    menu.findItem(R.id.menu_edit)?.isVisible = true
                 }
-            }
 
-        })
+                override fun OnSelectAll(itemSelectedCount: Int, allItemCount: Int) {
+                }
+
+                override fun OnItemSelected(selectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                    menu.findItem(R.id.menu_trash)?.isVisible = true
+                    menu.findItem(R.id.menu_add)?.isVisible = false
+                    menu.findItem(R.id.menu_edit)?.isVisible = false
+                    menu.findItem(R.id.search)?.isVisible = false
+
+                }
+
+                override fun OnItemDeselected(deselectedPosition: Int, itemSelectedCount: Int, allItemCount: Int) {
+                    if (itemSelectedCount == 0) {
+                        menu.findItem(R.id.menu_trash)?.isVisible = false
+                        menu.findItem(R.id.menu_add)?.isVisible = true
+                        menu.findItem(R.id.menu_edit)?.isVisible = true
+                        menu.findItem(R.id.search)?.isVisible = true
+                    }
+                }
+
+            })
+        }else{
+            menu.findItem(R.id.menu_trash)?.isVisible = false
+            menu.findItem(R.id.menu_add)?.isVisible = false
+            menu.findItem(R.id.search)?.isVisible = false
+            menu.findItem(R.id.menu_edit)?.isVisible = false
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -290,7 +299,7 @@ class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 /**
  * Display detail message of K
  */
-abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : RecyclerView.Adapter<DetailAdapter.DetailViewHolder>() {
+abstract class DetailAdapter<K : Data>(val context: Context, var entity: K, var isAdmin: Boolean = true) : RecyclerView.Adapter<DetailAdapter.DetailViewHolder>() {
     protected val typedValue = TypedValue()
     protected val background: Int
     abstract val id: Long
@@ -336,7 +345,7 @@ abstract class DetailAdapter<K : Data>(val context: Context, var entity: K) : Re
     override fun onBindViewHolder(holder: DetailViewHolder?, position: Int) {
         holder?.apply {
             textView.text = values[position].string
-            imageView.visibility = if (values[position].isGoEnable) View.VISIBLE else View.GONE
+            imageView.visibility = if (values[position].isGoEnable && isAdmin) View.VISIBLE else View.GONE
         }
     }
 

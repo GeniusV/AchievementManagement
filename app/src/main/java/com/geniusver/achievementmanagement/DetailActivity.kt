@@ -43,12 +43,16 @@ class DetailActivity : AppCompatActivity(), Identifiable {
 
     val entityMap = HashMap<String, () -> Data>()
 
+    var enableMenu: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
+        enableMenu = intent.getBooleanExtra(IntentKey.IS_ADMIN, true)
+
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(enableMenu)
 
 
         if (Intent.ACTION_SEARCH == intent.action) {
@@ -188,25 +192,27 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 val item = intent.getSerializableExtra(IntentKey.ITEM) as Student
                 collapsing_toolbar.title = "Student - ${item.name}"
                 detail.layoutManager = LinearLayoutManager(this)
-                detail.adapter = StudentDetailAdapter(this, item).apply {
+                detail.adapter = StudentDetailAdapter(this, item, isAdmin = enableMenu).apply {
                     refreshList.add(this::refresh)
                     entityMap["student"] = this::entity
                 }
 
                 viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
                     addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
-                        mAdapter = ScoreRecyclerAdapter(applicationContext, student = item, displayMode = Score.COURSE).apply {
+                        mAdapter = ScoreRecyclerAdapter(applicationContext, student = item, displayMode = Score.COURSE, isAdmin = enableMenu).apply {
                             setMultiChoiceToolbar(newMultiChoiceToolbar())
                         }
                         refreshList.add(this::refresh)
                         enableEdit = true
+                        isMenuEnable = enableMenu
                     }, "Course")
                     addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
-                        mAdapter = ScoreRecyclerAdapter(applicationContext, student = item, displayMode = Score.TERM).apply {
+                        mAdapter = ScoreRecyclerAdapter(applicationContext, student = item, displayMode = Score.TERM, isAdmin = enableMenu).apply {
                             setMultiChoiceToolbar(newMultiChoiceToolbar())
                         }
                         refreshList.add(this::refresh)
                         enableEdit = true
+                        isMenuEnable = enableMenu
                     }, "Term")
                 }
             }
@@ -238,13 +244,14 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                 detail.layoutManager = LinearLayoutManager(this)
 
 
-                detail.adapter = ScoreDetailAdapter(this, item, isStudentChosed, isCourseChosed, isTermChosed).apply {
+                detail.adapter = ScoreDetailAdapter(this, item, isStudentChosed, isCourseChosed, isTermChosed, isAdmin = enableMenu).apply {
                     refreshList.add(this::refresh)
                     entityMap["score"] = this::entity
                     viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
                         addFragment(ContentFragment<ScoreRecyclerAdapter.ScoreViewHolder, Score>().apply {
-                            mAdapter = ScoreRecyclerAdapter(applicationContext, student = item.student, course = item.course, term = item.term, displayMode = displayMode, final = true).apply {
+                            mAdapter = ScoreRecyclerAdapter(applicationContext, student = item.student, course = item.course, term = item.term, displayMode = displayMode, final = true, isAdmin = enableMenu).apply {
                                 setMultiChoiceToolbar(newMultiChoiceToolbar())
+                                isMenuEnable = enableMenu
                             }
                             refreshList.add(this::refresh)
                         }, tabString)
