@@ -30,6 +30,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import kotlinx.android.synthetic.main.login_admin.*
 
 /**
@@ -46,17 +47,24 @@ class AdminLoginFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.login_admin, container, false)
         view?.findViewById<Button>(R.id.login)?.setOnClickListener {
-            val password = student_password.text.toString()
-            if (password == "123456") {
-                val intent = Intent(context, MainActivity::class.java)
-                startActivity(intent)
-            } else {
-                AlertDialog.Builder(context).apply {
-                    setMessage("The password is wrong!!")
-                    setPositiveButton("Ok", { _, _ -> Unit })
-                }.create().show()
-            }
+            val password = teacher_password.text.toString().trim()
+            RequestCenter.TeacherRequester.getTeacher(context, ::onCheckPasswordReturned, {
+                Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
+            }, id = teacher_id.text.toString().trim().toLongOrNull(), password = password)
         }
         return view
     }
+
+    fun onCheckPasswordReturned(teacher: Teacher) {
+        if (teacher.id == 0L) {
+            AlertDialog.Builder(context).apply {
+                setMessage("The password is wrong!!")
+                setPositiveButton("Ok", { _, _ -> Unit })
+            }.create().show()
+        } else {
+            val intent = Intent(context, MainActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
 }
