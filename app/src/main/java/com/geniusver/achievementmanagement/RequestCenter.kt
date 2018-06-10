@@ -44,6 +44,43 @@ class RequestCenter {
         val apiDomain = "http://192.168.1.109:8080"
     }
 
+
+    class TeacherRequester{
+        companion object {
+            val url = "$apiDomain/teacher"
+
+            fun getTeacher(context: Context, successCallBack: (Teacher) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "", password: String? = null) {
+
+                var requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
+                if(password != null){
+                    requestUrl = "$url/search/findByIdAndPassword?id=$id&password=$password"
+                    val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                            Response.Listener<JSONObject> { processTeacherData(it, successCallBack) },
+                            Response.ErrorListener { successCallBack(Teacher(0, "", "")) }
+                    )
+                    Volley.newRequestQueue(context).add(request)
+                    return
+                }
+
+                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                        Response.Listener<JSONObject> { processTeacherData(it, successCallBack) },
+                        Response.ErrorListener { errorCallback(it) }
+                )
+                Volley.newRequestQueue(context).add(request)
+
+            }
+
+            private fun processTeacherData(teacherJSONObject: JSONObject, successCallback: (Teacher) -> Unit) {
+                val name = teacherJSONObject.getString("name")
+                val links = teacherJSONObject.getJSONObject("_links")
+                val self = links.getJSONObject("self")
+                val href = self.getString("href")
+                val id = href.split("/").last().toLong()
+                successCallback(Teacher(id, name, ""))
+            }
+        }
+    }
+
     class CollageRequester {
         companion object {
 

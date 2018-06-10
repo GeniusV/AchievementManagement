@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         supportActionBar?.apply {
-            title = "Welcome~ DarkFlameMaster"
+            title = "Welcome ~~~~~~~~~~"
         }
 
         viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {
