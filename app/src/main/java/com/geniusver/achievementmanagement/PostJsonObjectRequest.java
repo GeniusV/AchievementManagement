@@ -22,6 +22,7 @@
 
 package com.geniusver.achievementmanagement;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
@@ -31,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * Created by GeniusV on 3/29/18.
@@ -42,6 +44,7 @@ import java.io.UnsupportedEncodingException;
  * Thanks to https://stackoverflow.com/questions/32104423/volley-jsonexception-end-of-input-at-character-0-of
  * */
 public class PostJsonObjectRequest extends JsonObjectRequest {
+
     public PostJsonObjectRequest(int method, String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         super(method, url, jsonRequest, listener, errorListener);
     }
@@ -68,5 +71,12 @@ public class PostJsonObjectRequest extends JsonObjectRequest {
         } catch (JSONException je) {
             return Response.error(new ParseError(je));
         }
+    }
+
+    @Override
+    public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = super.getHeaders();
+        headers.put("Authorization", RequestCenter.Companion.getToken());
+        return headers;
     }
 }
