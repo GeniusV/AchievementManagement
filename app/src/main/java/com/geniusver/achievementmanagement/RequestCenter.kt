@@ -24,13 +24,10 @@ package com.geniusver.achievementmanagement
 
 import android.content.Context
 import com.android.volley.Request
-import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.geniusver.achievementmanagement.RequestCenter.CollageRequester.Companion.getMaxPageSize
-import com.geniusver.achievementmanagement.RequestCenter.CollageRequester.Companion.processCollageData
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -41,33 +38,37 @@ import org.json.JSONObject
 class RequestCenter {
 
     companion object {
-        val apiDomain = "http://192.168.1.109:8080"
+        val apiDomain = "http://10.0.2.2:8080"
+        var token = ""
+
+        fun setToken(userName: String, password: String) {
+            token = "Basic " + Base64Util.getBase64("$userName:$password")
+        }
     }
 
-
-    class TeacherRequester{
+    class TeacherRequester {
         companion object {
             val url = "$apiDomain/teacher"
 
             fun getTeacher(context: Context, successCallBack: (Teacher) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "", password: String? = null) {
 
                 var requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
-                if(password != null){
+                if (password != null) {
+                    setToken(id.toString(), password)
                     requestUrl = "$url/search/findByIdAndPassword?id=$id&password=$password"
-                    val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                    val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                             Response.Listener<JSONObject> { processTeacherData(it, successCallBack) },
-                            Response.ErrorListener { successCallBack(Teacher(0, "", "")) }
+                            Response.ErrorListener { successCallBack(Teacher(0, "", "")); it.printStackTrace() }
                     )
                     Volley.newRequestQueue(context).add(request)
                     return
                 }
 
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processTeacherData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
                 Volley.newRequestQueue(context).add(request)
-
             }
 
             private fun processTeacherData(teacherJSONObject: JSONObject, successCallback: (Teacher) -> Unit) {
@@ -84,7 +85,7 @@ class RequestCenter {
     class CollageRequester {
         companion object {
 
-            fun getMaxPageSize(jsonObject: JSONObject): Int{
+            fun getMaxPageSize(jsonObject: JSONObject): Int {
                 val page = jsonObject.getJSONObject("page")
                 val totalPage = page.getString("totalPages").toInt()
                 return totalPage
@@ -92,7 +93,7 @@ class RequestCenter {
 
             val url = "$apiDomain/collage"
             fun getCollages(page: Int, size: Int, context: Context, successCallback: (List<Collage>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                val request = PostJsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                         null,
                         Response.Listener<JSONObject> { processCollagesData(it, successCallback) },
                         Response.ErrorListener { errorCallback(it) })
@@ -116,7 +117,7 @@ class RequestCenter {
 
             fun getCollage(context: Context, successCallBack: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "") {
                 val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processCollageData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
@@ -168,13 +169,13 @@ class RequestCenter {
             val url = "$apiDomain/major"
             fun getMajors(page: Int, size: Int, context: Context, successCallback: (List<Major>, Int) -> Unit, errorCallback: (VolleyError) -> Unit, collage: Collage? = null) {
                 if (collage != null) {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByCollage?page=$page&size=$size&collage=${CollageRequester.url}/${collage.id}",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url/search/findByCollage?page=$page&size=$size&collage=${CollageRequester.url}/${collage.id}",
                             null,
                             Response.Listener<JSONObject> { processMajorsData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
                     Volley.newRequestQueue(context).add(request)
                 } else {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                             null,
                             Response.Listener<JSONObject> { processMajorsData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
@@ -185,7 +186,7 @@ class RequestCenter {
 
 
             fun getMajorCollage(major: Major, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url/${major.id}/collage", null,
+                val request = PostJsonObjectRequest(Request.Method.GET, "$url/${major.id}/collage", null,
                         Response.Listener<JSONObject> { CollageRequester.processCollageData(it, successCallback) },
                         Response.ErrorListener(errorCallback))
                 Volley.newRequestQueue(context).add(request)
@@ -210,7 +211,7 @@ class RequestCenter {
 
                 val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
 
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processMajorData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
@@ -264,13 +265,13 @@ class RequestCenter {
             val url = "$apiDomain/course"
             fun getCourses(page: Int, size: Int, context: Context, successCallback: (List<Course>, Int) -> Unit, errorCallback: (VolleyError) -> Unit, collage: Collage? = null) {
                 if (collage != null) {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByCollage?page=$page&size=$size&collage=${CollageRequester.url}/${collage.id}",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url/search/findByCollage?page=$page&size=$size&collage=${CollageRequester.url}/${collage.id}",
                             null,
                             Response.Listener<JSONObject> { processCoursesData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
                     Volley.newRequestQueue(context).add(request)
                 } else {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                             null,
                             Response.Listener<JSONObject> { processCoursesData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
@@ -281,7 +282,7 @@ class RequestCenter {
 
 
             fun getCourseCollage(course: Course, context: Context, successCallback: (Collage) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url/${course.id}/collage", null,
+                val request = PostJsonObjectRequest(Request.Method.GET, "$url/${course.id}/collage", null,
                         Response.Listener<JSONObject> { CollageRequester.processCollageData(it, successCallback) },
                         Response.ErrorListener(errorCallback))
                 Volley.newRequestQueue(context).add(request)
@@ -306,7 +307,7 @@ class RequestCenter {
 
                 val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
 
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processCourseData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
@@ -359,13 +360,13 @@ class RequestCenter {
             val url = "$apiDomain/claxx"
             fun getClaxxs(page: Int, size: Int, context: Context, successCallback: (List<Claxx>, Int) -> Unit, errorCallback: (VolleyError) -> Unit, major: Major? = null) {
                 if (major != null) {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByMajor?page=$page&size=$size&major=${MajorRequester.url}/${major.id}",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url/search/findByMajor?page=$page&size=$size&major=${MajorRequester.url}/${major.id}",
                             null,
                             Response.Listener<JSONObject> { processClaxxsData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
                     Volley.newRequestQueue(context).add(request)
                 } else {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                             null,
                             Response.Listener<JSONObject> { processClaxxsData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
@@ -376,7 +377,7 @@ class RequestCenter {
 
 
             fun getClaxxMajor(claxx: Claxx, context: Context, successCallback: (Major) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url/${claxx.id}/major", null,
+                val request = PostJsonObjectRequest(Request.Method.GET, "$url/${claxx.id}/major", null,
                         Response.Listener<JSONObject> { MajorRequester.processMajorData(it, successCallback) },
                         Response.ErrorListener(errorCallback))
                 Volley.newRequestQueue(context).add(request)
@@ -401,7 +402,7 @@ class RequestCenter {
 
                 val requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
 
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processClaxxData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
@@ -455,13 +456,13 @@ class RequestCenter {
             val url = "$apiDomain/student"
             fun getStudents(page: Int, size: Int, context: Context, successCallback: (List<Student>, Int) -> Unit, errorCallback: (VolleyError) -> Unit, claxx: Claxx? = null) {
                 if (claxx != null) {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url/search/findByClaxx?page=$page&size=$size&claxx=${ClaxxRequester.url}/${claxx.id}",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url/search/findByClaxx?page=$page&size=$size&claxx=${ClaxxRequester.url}/${claxx.id}",
                             null,
                             Response.Listener<JSONObject> { processStudentsData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
                     Volley.newRequestQueue(context).add(request)
                 } else {
-                    val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                    val request = PostJsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                             null,
                             Response.Listener<JSONObject> { processStudentsData(it, successCallback) },
                             Response.ErrorListener { errorCallback(it) })
@@ -472,7 +473,7 @@ class RequestCenter {
 
 
             fun getStudentClaxx(student: Student, context: Context, successCallback: (Claxx) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url/${student.id}/claxx", null,
+                val request = PostJsonObjectRequest(Request.Method.GET, "$url/${student.id}/claxx", null,
                         Response.Listener<JSONObject> { ClaxxRequester.processClaxxData(it, successCallback) },
                         Response.ErrorListener(errorCallback))
                 Volley.newRequestQueue(context).add(request)
@@ -490,15 +491,16 @@ class RequestCenter {
                     val id = href.split("/").last().toLong()
                     result.add(Student(id, name, null))
                 }
-                successCallback(result,  getMaxPageSize(studentJSONObject))
+                successCallback(result, getMaxPageSize(studentJSONObject))
             }
 
             fun getStudent(context: Context, successCallBack: (Student) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, name: String = "", password: String? = null) {
 
                 var requestUrl = if (name == "") "$url/$id" else "$url/search/findByName?name=$name"
-                if(password != null){
+                if (password != null) {
+                    setToken(id.toString(), password)
                     requestUrl = "$url/search/findByIdAndPassword?id=$id&password=$password"
-                    val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                    val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                             Response.Listener<JSONObject> { processStudentData(it, successCallBack) },
                             Response.ErrorListener { successCallBack(Student(0, "", null)) }
                     )
@@ -506,7 +508,7 @@ class RequestCenter {
                     return
                 }
 
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processStudentData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
@@ -525,7 +527,7 @@ class RequestCenter {
 
             fun postStudent(student: Student, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
                 val data = mapOf(Pair("name", student.name), Pair("claxx", "${ClaxxRequester.url}/${student.claxx!!.id}"))
-                if(student.password != "") data.plus(Pair("password", student.password))
+                if (student.password != "") data.plus(Pair("password", student.password))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
                         Response.Listener { successCallBack() },
@@ -547,7 +549,7 @@ class RequestCenter {
 
             fun patchStudent(student: Student, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
                 var data = mapOf(Pair("name", student.name), Pair("claxx", "${ClaxxRequester.url}/${student.claxx!!.id}"))
-                if(student.password != "") data = mapOf(Pair("name", student.name), Pair("claxx", "${ClaxxRequester.url}/${student.claxx!!.id}"), Pair("password", student.password))
+                if (student.password != "") data = mapOf(Pair("name", student.name), Pair("claxx", "${ClaxxRequester.url}/${student.claxx!!.id}"), Pair("password", student.password))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${student.id}", jsonObject,
                         Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
@@ -561,7 +563,7 @@ class RequestCenter {
         companion object {
             val url = "$apiDomain/term"
             fun getTerms(page: Int, size: Int, context: Context, successCallback: (List<Term>, Int) -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val request = JsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
+                val request = PostJsonObjectRequest(Request.Method.GET, "$url?page=$page&size=$size",
                         null,
                         Response.Listener<JSONObject> { processTermsData(it, successCallback) },
                         Response.ErrorListener { errorCallback(it) })
@@ -585,7 +587,7 @@ class RequestCenter {
 
             fun getTerm(context: Context, successCallBack: (Term) -> Unit, errorCallback: (VolleyError) -> Unit, id: Long? = 0, value: String = "") {
                 val requestUrl = if (value == "") "$url/$id" else "$url/search/findByValue?value=$value"
-                val request = JsonObjectRequest(Request.Method.GET, requestUrl, null,
+                val request = PostJsonObjectRequest(Request.Method.GET, requestUrl, null,
                         Response.Listener<JSONObject> { processTermData(it, successCallBack) },
                         Response.ErrorListener { errorCallback(it) }
                 )
@@ -647,7 +649,7 @@ class RequestCenter {
                 val methodName = "findBy" + fieldList.joinToString("And")
                 val paramString = "&projection=scoreProjection&page=$page&size=$size&" + paramList.joinToString("&")
 
-                val request = JsonObjectRequest(Request.Method.GET, "$url/search/$methodName?$paramString",
+                val request = PostJsonObjectRequest(Request.Method.GET, "$url/search/$methodName?$paramString",
                         null,
                         Response.Listener<JSONObject> { processScoresData(it, successCallback) },
                         Response.ErrorListener { errorCallback(it) })
@@ -689,7 +691,7 @@ class RequestCenter {
             }
 
             fun postScore(score: Score, context: Context, successCallBack: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf(Pair("value", score.value), Pair("student", "${StudentRequester.url}/${score.student?.id}"), Pair("course", "${CourseRequester.url}/${score.course?.id}"), Pair("term", "${TermRequester.url}/${score.term?.id}") )
+                val data = mapOf(Pair("value", score.value), Pair("student", "${StudentRequester.url}/${score.student?.id}"), Pair("course", "${CourseRequester.url}/${score.course?.id}"), Pair("term", "${TermRequester.url}/${score.term?.id}"))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.POST, url, jsonObject,
                         Response.Listener { successCallBack() },
@@ -697,7 +699,7 @@ class RequestCenter {
                 Volley.newRequestQueue(context).add(request)
             }
 
-            fun deleteScores(context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit,scores: List<Score>? = null, student: Student? = null, course: Course? = null, term: Term? = null) {
+            fun deleteScores(context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit, scores: List<Score>? = null, student: Student? = null, course: Course? = null, term: Term? = null) {
                 val requestQueue = Volley.newRequestQueue(context)
                 scores?.forEachIndexed { index, score ->
                     val id = score.id
@@ -710,7 +712,7 @@ class RequestCenter {
             }
 
             fun patchScore(score: Score, context: Context, successCallback: () -> Unit, errorCallback: (VolleyError) -> Unit) {
-                val data = mapOf(Pair("value", score.value), Pair("student", "${StudentRequester.url}/${score.student?.id}"), Pair("course", "${CourseRequester.url}/${score.course?.id}"), Pair("term", "${TermRequester.url}/${score.term?.id}") )
+                val data = mapOf(Pair("value", score.value), Pair("student", "${StudentRequester.url}/${score.student?.id}"), Pair("course", "${CourseRequester.url}/${score.course?.id}"), Pair("term", "${TermRequester.url}/${score.term?.id}"))
                 val jsonObject = JSONObject(data)
                 val request = PostJsonObjectRequest(Request.Method.PATCH, "$url/${score.id}", jsonObject,
                         Response.Listener { successCallback() }, Response.ErrorListener { errorCallback(it) })
