@@ -140,7 +140,7 @@ class DetailActivity : AppCompatActivity(), Identifiable {
                         }
                         refreshList.add(this::refresh)
                         enableEdit = true
-                    }, "Claxx")
+                    }, "Class")
                 }
             }
 

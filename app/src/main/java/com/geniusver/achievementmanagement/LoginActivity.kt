@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         supportActionBar?.apply {
-            title = "Welcome ~~~~~~~~~~"
+            title = "学生成绩管理系统"
         }
 
         viewpaper.adapter = MyPagerAdapter(supportFragmentManager).apply {

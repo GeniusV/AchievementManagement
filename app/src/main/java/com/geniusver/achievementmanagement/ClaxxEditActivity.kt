@@ -44,7 +44,7 @@ class ClaxxEditActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_cancel)
             setDisplayHomeAsUpEnabled(true)
-            title = "Claxx"
+            title = "Class"
         }
 
         action = intent.getStringExtra(IntentKey.ACTION)
